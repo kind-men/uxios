@@ -1,0 +1,21 @@
+﻿{
+  "name": "com.kindmen.uxios",
+  "version": "1.0.0",
+  "displayName": "Uxios",
+  "description": "A port of the Axios HTTP client for Unity",
+  "unity": "2022.2",
+  "documentationUrl": "",
+  "changelogUrl": "",
+  "licensesUrl": "",
+  "keywords": [
+  ],
+  "author": {
+    "name": "Mike van Riel",
+    "url": "https://www.kind-men.com"
+  },
+  "dependencies": {
+    "com.unity.modules.unitywebrequest": "1.0.0",
+    "com.unity.nuget.newtonsoft-json": "3.2.0",
+    "com.rsg.promise":  "3.0.1"
+  }
+}
