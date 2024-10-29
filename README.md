@@ -15,8 +15,8 @@ interceptors, and cleaner syntax, enabling Unity developers to build data-driven
 ## Performing GET Requests
 
 In Uxios, GET requests are designed to be simple yet flexible, assuming by default that you’re interacting with
-JSON-based endpoints. Uxios automatically deserializes JSON responses into C# objects using Json.NET, making it easy to
-work with structured data in Unity.
+JSON-based endpoints. Uxios automatically deserializes JSON responses into C# objects using 
+[Json.NET](https://www.newtonsoft.com/json), making it easy to work with structured data in Unity.
 
 ### Basic GET Request Example (JSON Response)
 
@@ -50,8 +50,8 @@ public class ExampleGet : MonoBehaviour
 ```
 
 In this example, Uxios automatically deserializes the JSON data from the endpoint into an object accessible
-via `response.Data`. When no type is specified, the JSON data is converted into a [JObject](https://www.newtonsoft.com/json/help/html/t_newtonsoft_json_linq_jobject.htm)
-object for easy access.
+via `response.Data`. When no type is specified, the JSON data is converted into a 
+[JObject](https://www.newtonsoft.com/json/help/html/t_newtonsoft_json_linq_jobject.htm) object for easy access.
 
 ## Retrieving Different Data Types
 
@@ -94,8 +94,8 @@ Response object, where the Data property holds the retrieved data.
    ```
 
 4. **Any Serializable Object Type**: For JSON-based APIs, Uxios can deserialize JSON into any custom object type that 
-   is JSON-serializable. This is particularly powerful, as it leverages Json.NET to convert complex JSON responses into 
-   strongly-typed C# objects, simplifying data handling.
+   is JSON-serializable. This is particularly powerful, as it leverages [Json.NET](https://www.newtonsoft.com/json) to 
+   convert complex JSON responses into strongly-typed C# objects, simplifying data handling.
 
    ```csharp
    uxios.Get<MyCustomType>(new Uri("https://api.example.com/data"))
