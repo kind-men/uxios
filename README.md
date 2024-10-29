@@ -10,9 +10,7 @@ solution for Unity projects across platforms.
 
 Unity's built-in UnityWebRequest API, while powerful, can be verbose and cumbersome, especially for those familiar with
 modern JavaScript libraries like Axios. Uxios simplifies HTTP requests with features like promises, request
-interceptors, and cleaner syntax, enabling Unity developers to build data-driven applications more easily. It also
-addresses common WebGL limitations by seamlessly integrating with Unity’s async operation framework, offering a robust
-alternative for developers looking to expand Unity’s web capabilities.
+interceptors, and cleaner syntax, enabling Unity developers to build data-driven applications more easily.
 
 ## Performing GET Requests
 
