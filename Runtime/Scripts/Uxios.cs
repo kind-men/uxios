@@ -16,7 +16,6 @@ namespace KindMen.Uxios
         public delegate Error ErrorInterceptor(Error error);
     }
 
-    // TODO: REPLACE PROMISES LIB WITH UNITASK??
     public sealed class Uxios
     {
         private static (
@@ -130,14 +129,19 @@ namespace KindMen.Uxios
             return Request<byte[]>(clone);
         }
 
-        public Promise<Response> Post(Uri url, object data = null, Config config = null)
+        public Promise<Response> Post(Uri url, byte[] data = null, Config config = null)
         {
             return Post<byte[], byte[]>(url, data, config);
         }
 
+        public Promise<Response> Post(Uri url, string data = null, Config config = null)
+        {
+            return Post<string, byte[]>(url, data, config);
+        }
+
         public Promise<Response> Post<TRequestData, TResponse>(
             Uri url, 
-            object data = null, 
+            TRequestData data = null, 
             Config config = null
         ) where TRequestData : class
         {
@@ -152,7 +156,21 @@ namespace KindMen.Uxios
             return Request<TRequestData>(clone);
         }
 
-        public Promise<Response> Put(Uri url, object data, Config config = null)
+        public Promise<Response> Put(Uri url, byte[] data, Config config = null)
+        {
+            return Put<byte[], byte[]>(url, data, config);
+        }
+
+        public Promise<Response> Put(Uri url, string data, Config config = null)
+        {
+            return Put<string, byte[]>(url, data, config);
+        }
+
+        public Promise<Response> Put<TRequestData, TResponse>(
+            Uri url, 
+            TRequestData data = null, 
+            Config config = null
+        ) where TRequestData : class
         {
             config ??= this.defaultConfig;
 
@@ -160,11 +178,26 @@ namespace KindMen.Uxios
             clone!.Url = url;
             clone!.Method = HttpMethod.Put;
             clone!.Data = data;
+            clone!.ResponseType = ResolveExpectedResponseBasedOnType<TResponse>();
 
-            return Request<byte[]>(clone);
+            return Request<TRequestData>(clone);
         }
 
-        public Promise<Response> Patch(Uri url, object data, Config config = null)
+        public Promise<Response> Patch(Uri url, byte[] data, Config config = null)
+        {
+            return Patch<byte[], byte[]>(url, data, config);
+        }
+
+        public Promise<Response> Patch(Uri url, string data, Config config = null)
+        {
+            return Patch<string, byte[]>(url, data, config);
+        }
+
+        public Promise<Response> Patch<TRequestData, TResponse>(
+            Uri url, 
+            TRequestData data = null, 
+            Config config = null
+        ) where TRequestData : class
         {
             config ??= this.defaultConfig;
 
@@ -172,8 +205,26 @@ namespace KindMen.Uxios
             clone!.Url = url;
             clone!.Method = HttpMethod.Patch;
             clone!.Data = data;
+            clone!.ResponseType = ResolveExpectedResponseBasedOnType<TResponse>();
 
-            return Request<byte[]>(clone);
+            return Request<TRequestData>(clone);
+        }
+
+        /// <summary>
+        /// Sometimes you want a blocking flow inside a coroutine, this method will help to wait for the completion of a
+        /// promise inside a CoRoutine. Do mind, this is not a recommended practice as promises are more than capable of
+        /// running their own course.
+        ///
+        /// The main function of this is when you depend on other libraries to do stuff after the request completed, or
+        /// to assist in writing PlayMode tests where you need to run the asserts outside of the promise return
+        /// functions / wait because otherwise NUnit has moved on; see our own tests at
+        /// <see cref="KindMen.Uxios.Tests.GetRequests"/>.
+        /// </summary>
+        /// <param name="request">The promise to wait for</param>
+        /// <returns>Custom yield instruction - this method can be as as part of a `yield return` clause</returns>
+        public static CustomYieldInstruction WaitForRequest(Promise<Response> request)
+        {
+            return new WaitUntil(() => request.CurState != PromiseState.Pending);
         }
     }
 }

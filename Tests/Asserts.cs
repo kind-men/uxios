@@ -50,15 +50,12 @@ namespace KindMen.Uxios.Tests
                 // Double dispatch the onError action to inject the response, but delay execution until the end
                 .Catch(e => assertResponse = () => onError(e));
 
-            yield return WaitForPromise(promise);
+            // Wait for the request to complete because assertions cannot happen within the Then and Catch mechanisms
+            // because promises catch exceptions, including AssertExceptions 
+            yield return Uxios.WaitForRequest(promise);
 
             // Execute the curried response so that any assertion failure exception will properly bubble up
             assertResponse();
-        }
-
-        private static CustomYieldInstruction WaitForPromise(Promise<Response> promise)
-        {
-            return new WaitUntil(() => promise.CurState != PromiseState.Pending);
         }
     }
 }

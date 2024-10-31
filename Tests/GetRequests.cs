@@ -8,7 +8,7 @@ using UnityEngine.TestTools;
 
 namespace KindMen.Uxios.Tests
 {
-    public class Uxios
+    public class GetRequests
     {
         private class ExamplePost
         {
@@ -187,39 +187,6 @@ namespace KindMen.Uxios.Tests
             var promise = uxios.Get<ExamplePost>(url);
 
             yield return Asserts.AssertPromiseErrorsWithMessage(promise, "Unable to parse response as JSON");
-        }
-
-        [UnityTest]
-        public IEnumerator PostsObjectAsJson()
-        {
-            var uxios = new KindMen.Uxios.Uxios();
-            var url = new Uri("https://kind-men.com");
-
-            var data = new ExamplePost
-            {
-                userId = 10, 
-                id = 11, 
-                title = "Example title", 
-                body = "This is an example body"
-            };
-
-            Action<Response> onSuccess = response =>
-            {
-                Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
-                Assert.That(response.Data, Is.TypeOf<ExamplePost>());
-                ExamplePost post = response.Data as ExamplePost;
-                
-                Assert.That(post, Is.Not.Null);
-                Assert.That(post.userId, Is.EqualTo(data.userId));
-                Assert.That(post.id, Is.EqualTo(data.id));
-                Assert.That(post.title, Is.EqualTo(data.title));
-                Assert.That(post.body, Is.EqualTo(data.body));
-                Assert.That(response.Headers, Contains.Key("Content-type"));
-                Assert.That(response.Headers["Content-type"], Is.EqualTo("application/json; charset=UTF-8"));
-            };
-
-            var promise = uxios.Post<ExamplePost, ExamplePost>(url, data);
-            yield return Asserts.AssertPromiseSucceeds(promise, onSuccess);
         }
     }
 }

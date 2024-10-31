@@ -58,6 +58,7 @@ namespace KindMen.Uxios
             var expectedType = expectedResponse.DeserializeAs;
             var settings = expectedResponse.Settings;
 
+            Debug.Log(jsonText);
             object asJsonObject;
             try
             {

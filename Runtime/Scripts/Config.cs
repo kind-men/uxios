@@ -7,6 +7,7 @@ using System.Threading;
 using KindMen.Uxios.Http;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
+using QueryParameters = KindMen.Uxios.Http.QueryParameters;
 
 namespace KindMen.Uxios
 {
@@ -46,17 +47,21 @@ namespace KindMen.Uxios
             UnityWebRequest = new UnityWebRequest(url, Method.ToString());
             UnityWebRequest.timeout = Timeout;
             UnityWebRequest.redirectLimit = MaxRedirects;
-            // TODO: Fetch "Accept" header from ResponseType and if no Accept header was set: set it here
             UnityWebRequest.downloadHandler = DownloadHandler ?? ResponseType switch
             {
                 ExpectTextureResponse responseType => new DownloadHandlerTexture(responseType.Readable),
                 _ => new DownloadHandlerBuffer()
             };
 
-            var bytes = ConvertToByteArray<TData>(Data);
+            var (contentType, bytes) = ConvertToByteArray<TData>(Data);
             if (bytes != null)
             {
                 UnityWebRequest.uploadHandler = new UploadHandlerRaw(bytes);
+            }
+
+            if (string.IsNullOrEmpty(contentType) == false)
+            {
+                UnityWebRequest.SetRequestHeader("Content-Type", contentType);
             }
 
             foreach (var header in Headers)
@@ -65,26 +70,33 @@ namespace KindMen.Uxios
             }
         }
 
-        private byte[] ConvertToByteArray<T>(object data) where T : class
+        private (string contentType, byte[] bytes) ConvertToByteArray<T>(object data) where T : class
         {
             T dataToSend = data as T;
-            byte[] bytes = null;
+            if (data == null)
+            {
+                return (null, null);
+            }
+            
             if (dataToSend is byte[] asByteArray)
             {
-                bytes = asByteArray;
+                return ("application/octet-stream", bytes: asByteArray);
             } 
-            else if (dataToSend is string asString)
+            
+            if (dataToSend is string asString)
             {
-                bytes = System.Text.Encoding.UTF8.GetBytes(asString);
+                return ("text/plain", bytes: System.Text.Encoding.UTF8.GetBytes(asString));
             }
-            else if (dataToSend is object asObject)
+            
+            if (dataToSend is object asObject)
             {
                 // TODO: make setting configurable
                 var serializedString = JsonConvert.SerializeObject(asObject, typeof(T), null);
-                bytes = System.Text.Encoding.UTF8.GetBytes(serializedString);
+                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(serializedString);
+                return ("application/json", bytes);
             }
 
-            return bytes;
+            throw new Exception("Unable to determine how to convert this into a byte array");
         }
 
         public object Clone()
