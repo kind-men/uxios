@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using KindMen.Uxios.Interceptors;
 using Newtonsoft.Json.Linq;
@@ -8,68 +7,6 @@ using UnityEngine;
 
 namespace KindMen.Uxios
 {
-    namespace Interceptors
-    {
-        public delegate Config RequestInterception(Config request);
-        public delegate Response ResponseInterception(Response response);
-        public delegate Error ErrorInterception(Error error);
-
-        public sealed class Interceptors
-        {
-            public List<RequestInterceptor> request = new();
-            public List<ResponseInterceptor> response = new();
-        }
-
-        public sealed class RequestInterceptor
-        {
-            public readonly RequestInterception success;
-            public readonly ErrorInterception error;
-
-            public RequestInterceptor(RequestInterception success, ErrorInterception error)
-            {
-                this.success = success;
-                this.error = error;
-            }
-
-
-            public RequestInterceptor(RequestInterception success)
-            {
-                this.success = success;
-                this.error = arg => arg;
-            }
-
-            public RequestInterceptor(ErrorInterception error)
-            {
-                this.success = arg => arg;
-                this.error = error;
-            }
-        }
-
-        public sealed class ResponseInterceptor
-        {
-            public readonly ResponseInterception success;
-            public readonly ErrorInterception error;
-
-            public ResponseInterceptor(ResponseInterception success, ErrorInterception error)
-            {
-                this.success = success;
-                this.error = error;
-            }
-
-            public ResponseInterceptor(ResponseInterception success)
-            {
-                this.success = success;
-                this.error = arg => arg;
-            }
-
-            public ResponseInterceptor(ErrorInterception error)
-            {
-                this.success = arg => arg;
-                this.error = error;
-            }
-        }
-    }
-
     public sealed class Uxios
     {
         public static Interceptors.Interceptors Interceptors { get; } = new();
