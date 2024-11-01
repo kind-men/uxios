@@ -59,8 +59,8 @@ namespace KindMen.Uxios
                 yield return null;
             }
  
-            // something in the request went wrong
-            if (request.result != UnityWebRequest.Result.Success)
+            // something in the request's connection went wrong
+            if (request.result is UnityWebRequest.Result.ConnectionError or UnityWebRequest.Result.DataProcessingError)
             {
                 var error = new Error(request.error, config, null);
                 foreach (var requestInterceptor in Uxios.Interceptors.request)
@@ -98,7 +98,13 @@ namespace KindMen.Uxios
             }
             catch (Exception e)
             {
-                promise.Reject(new Error(e.Message, config, null));
+                var error = new Error(e.Message, config, null);
+                foreach (var responseInterceptor in Uxios.Interceptors.response)
+                {
+                    error = responseInterceptor.error.Invoke(error);
+                }
+
+                promise.Reject(error);
             }
         }        
     }

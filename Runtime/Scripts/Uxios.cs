@@ -10,33 +10,69 @@ namespace KindMen.Uxios
 {
     namespace Interceptors
     {
-        // TODO: rework these to have a 'use' method, eject and that it is a tuple of a success and error interceptor 
-        public delegate Config RequestInterceptor(Config request);
-        public delegate Response ResponseInterceptor(Response response);
-        public delegate Error ErrorInterceptor(Error error);
+        public delegate Config RequestInterception(Config request);
+        public delegate Response ResponseInterception(Response response);
+        public delegate Error ErrorInterception(Error error);
+
+        public sealed class Interceptors
+        {
+            public List<RequestInterceptor> request = new();
+            public List<ResponseInterceptor> response = new();
+        }
+
+        public sealed class RequestInterceptor
+        {
+            public readonly RequestInterception success;
+            public readonly ErrorInterception error;
+
+            public RequestInterceptor(RequestInterception success, ErrorInterception error)
+            {
+                this.success = success;
+                this.error = error;
+            }
+
+
+            public RequestInterceptor(RequestInterception success)
+            {
+                this.success = success;
+                this.error = arg => arg;
+            }
+
+            public RequestInterceptor(ErrorInterception error)
+            {
+                this.success = arg => arg;
+                this.error = error;
+            }
+        }
+
+        public sealed class ResponseInterceptor
+        {
+            public readonly ResponseInterception success;
+            public readonly ErrorInterception error;
+
+            public ResponseInterceptor(ResponseInterception success, ErrorInterception error)
+            {
+                this.success = success;
+                this.error = error;
+            }
+
+            public ResponseInterceptor(ResponseInterception success)
+            {
+                this.success = success;
+                this.error = arg => arg;
+            }
+
+            public ResponseInterceptor(ErrorInterception error)
+            {
+                this.success = arg => arg;
+                this.error = error;
+            }
+        }
     }
 
     public sealed class Uxios
     {
-        private static (
-            List<(RequestInterceptor success, ErrorInterceptor error)> request,
-            List<(ResponseInterceptor success, ErrorInterceptor error)> response
-        ) interceptors = new();
-
-        public static (
-            List<(RequestInterceptor success, ErrorInterceptor error)> request,
-            List<(ResponseInterceptor success, ErrorInterceptor error)> response
-        ) Interceptors
-        {
-            get
-            {
-                // Force initialization of members so that we do not have to add checks in other places in the code.
-                interceptors.request ??= new List<(RequestInterceptor success, ErrorInterceptor error)>();
-                interceptors.response ??= new List<(ResponseInterceptor success, ErrorInterceptor error)>();
-
-                return interceptors;
-            }
-        }
+        public static Interceptors.Interceptors Interceptors { get; } = new();
 
         private readonly IRequestRunner requestRunner;
         private readonly Config defaultConfig;

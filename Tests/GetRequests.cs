@@ -110,16 +110,19 @@ namespace KindMen.Uxios.Tests
             yield return Asserts.AssertPromiseSucceeds(promise, onSuccess);
         }
 
+        // TODO: Add more error scenario's, such as CORS, DNS not found, timeout (difficult one to test) and 
+        //       a Unity DataProcessingError (trying to load a JSON as a Texture I think)
         [UnityTest]
         public IEnumerator CannotFindUrl()
         {
-            var uxios = new KindMen.Uxios.Uxios();
+            var uxios = new Uxios();
             var url = new Uri("https://kind-men.com/404");
 
             Action<Exception> onError = e =>
             {
                 var error = e as Error;
                 Assert.That(error, Is.Not.Null);
+                Assert.That(error.Response, Is.Not.Null);
                 Assert.That(error.Response.Status, Is.EqualTo(HttpStatusCode.NotFound));
             };
 
