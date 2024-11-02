@@ -124,6 +124,67 @@ namespace KindMen.Uxios.Tests.HttpClient
         }
         
         [UnityTest]
+        public IEnumerator FailIfTimeoutExpires()
+        {
+            var url = new Uri("https://httpbin.org/delay/3");
+
+            // Time-out set to 1 while the delay above is 3, this should trigger a timeout
+            Config config = new Config() { Timeout = 1 };
+            var promise = uxios.Get<string>(url, config);
+
+            yield return PromiseAssertions.AssertPromiseErrors(
+                promise, 
+                e =>
+                {
+                    var error = e as Error;
+                    Assert.That(error, Is.Not.Null);
+                    Assert.That(error.Response, Is.Null);
+                    Assert.That(error.Message, Is.EqualTo("Request timeout"));
+                }
+            );
+        }
+        
+        [UnityTest]
+        public IEnumerator FailIfExceedsTheNumberOfRedirects()
+        {
+            var url = new Uri("https://httpbin.org/redirect/5");
+
+            // Time-out set to 3 while the delay above is 5, this should trigger an error
+            Config config = new Config() { MaxRedirects = 3 };
+            var promise = uxios.Get<string>(url, config);
+
+            yield return PromiseAssertions.AssertPromiseErrors(
+                promise, 
+                e =>
+                {
+                    var error = e as Error;
+                    Assert.That(error, Is.Not.Null);
+                    Assert.That(error.Response, Is.Null);
+                    Assert.That(error.Message, Is.EqualTo("Redirect limit exceeded"));
+                }
+            );
+        }
+        
+        [UnityTest]
+        public IEnumerator FailIfHostDoesNotExist()
+        {
+            var url = new Uri("https://thisdomaindoesnotexist.eu/");
+
+            var promise = uxios.Get<string>(url);
+
+            yield return PromiseAssertions.AssertPromiseErrors(
+                promise, 
+                e =>
+                {
+                    var error = e as Error;
+                    Assert.That(error, Is.Not.Null);
+                    Assert.That(error.Response, Is.Null);
+                    Assert.That(error.Message, Is.EqualTo("Cannot resolve destination host"));
+                }
+            );
+        }
+        
+        [UnityTest]
         public IEnumerator GetsJsonAsTypedObject()
         {
             var url = new Uri("https://jsonplaceholder.typicode.com/posts/1");

@@ -30,7 +30,7 @@ namespace KindMen.Uxios
         public ExpectedTypeOfResponse TypeOfResponseType = null;
         
         public Func<HttpStatusCode, bool> ValidateStatus = status => (int)status >= 200 && (int)status < 300;
-        public int MaxRedirects = 5; // TODO: Test using https://httpbin.org/#/Redirects/get_absolute_redirect__n_
+        public int MaxRedirects = 5;
         public CancellationToken CancelToken;
         #endregion
         
