@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Net;
+using KindMen.Uxios.Http;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEngine;
@@ -50,6 +51,29 @@ namespace KindMen.Uxios.Tests.HttpClient
             yield return PromiseAssertions.AssertPromiseSucceeds(
                 promise, 
                 AssertExampleHtmlWasReceived
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator GetsWebpageBehindBasicAuthentication()
+        {
+            var url = new Uri("https://httpbin.org/basic-auth/username/password");
+
+            var credentials = new BasicAuthenticationCredentials("username", "password");
+            var config = new Config { Auth = credentials };
+            var promise = uxios.Get(url, config);
+
+            yield return PromiseAssertions.AssertPromiseSucceeds(
+                promise,
+                response =>
+                {
+                    Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
+    
+                    var json = response.Data as JObject;
+                    Assert.That(json, Is.Not.Null);
+                    Assert.That(json["authenticated"]?.Value<bool>(), Is.True);
+                    Assert.That(json["user"]?.Value<string>(), Is.EqualTo("username"));
+                }
             );
         }
 
@@ -105,7 +129,7 @@ namespace KindMen.Uxios.Tests.HttpClient
         // TODO: Add more error scenario's, such as CORS, DNS not found, timeout (difficult one to test) and 
         //       a Unity DataProcessingError (trying to load a JSON as a Texture I think); use https://httpbin.org/
         [UnityTest]
-        public IEnumerator CannotFindUrl()
+        public IEnumerator ErrorIfItCannotFindUrl()
         {
             var url = new Uri("https://httpbin.org/status/404");
 
@@ -124,7 +148,7 @@ namespace KindMen.Uxios.Tests.HttpClient
         }
         
         [UnityTest]
-        public IEnumerator FailIfTimeoutExpires()
+        public IEnumerator ErrorIfTimeoutExpires()
         {
             var url = new Uri("https://httpbin.org/delay/3");
 
@@ -145,7 +169,7 @@ namespace KindMen.Uxios.Tests.HttpClient
         }
         
         [UnityTest]
-        public IEnumerator FailIfExceedsTheNumberOfRedirects()
+        public IEnumerator ErrorIfDurationExceedsTheNumberOfRedirects()
         {
             var url = new Uri("https://httpbin.org/redirect/5");
 
@@ -166,7 +190,7 @@ namespace KindMen.Uxios.Tests.HttpClient
         }
         
         [UnityTest]
-        public IEnumerator FailIfHostDoesNotExist()
+        public IEnumerator ErrorIfHostDoesNotExist()
         {
             var url = new Uri("https://thisdomaindoesnotexist.eu/");
 
@@ -180,6 +204,28 @@ namespace KindMen.Uxios.Tests.HttpClient
                     Assert.That(error, Is.Not.Null);
                     Assert.That(error.Response, Is.Null);
                     Assert.That(error.Message, Is.EqualTo("Cannot resolve destination host"));
+                }
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator ErrorIfAuthenticationFails()
+        {
+            var url = new Uri("https://httpbin.org/basic-auth/username/password");
+
+            var credentials = new BasicAuthenticationCredentials("username", "wrong-password");
+            var config = new Config { Auth = credentials };
+            var promise = uxios.Get(url, config);
+
+            yield return PromiseAssertions.AssertPromiseErrors(
+                promise,
+                exception =>
+                {
+                    Error error = exception as Error;
+                    var response = error.Response;
+                    HttpAssertions.AssertStatusCode(response, HttpStatusCode.Unauthorized);
+    
+                    Assert.That(response.Data, Is.Null);
                 }
             );
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using KindMen.Uxios.ExpectedTypesOfResponse;
+using KindMen.Uxios.Http;
 using Newtonsoft.Json;
 using RSG;
 using UnityEngine;
@@ -65,6 +66,11 @@ namespace KindMen.Uxios
                 config.UnityWebRequest.uploadHandler = new UploadHandlerRaw(bytes);
             }
 
+            if (config.Auth is BasicAuthenticationCredentials credentials)
+            {
+                config.UnityWebRequest.SetRequestHeader("Authorization", credentials.ToAuthorizationToken());
+            }
+            
             if (string.IsNullOrEmpty(contentType) == false)
             {
                 config.UnityWebRequest.SetRequestHeader("Content-Type", contentType);
@@ -98,7 +104,7 @@ namespace KindMen.Uxios
 
                 yield return null;
             }
- 
+
             // something in the request's connection went wrong
             if (request.result is UnityWebRequest.Result.ConnectionError or UnityWebRequest.Result.DataProcessingError)
             {
@@ -119,7 +125,7 @@ namespace KindMen.Uxios
 
                 if (response.IsValid() == false) 
                 {
-                    var error = new Error(response.Data.ToString(), config, response);
+                    var error = new Error((string)response.Data, config, response);
                     foreach (var responseInterceptor in Uxios.Interceptors.response)
                     {
                         error = responseInterceptor.error.Invoke(error);

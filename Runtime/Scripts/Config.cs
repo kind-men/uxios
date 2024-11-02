@@ -24,8 +24,8 @@ namespace KindMen.Uxios
         public Headers Headers = new();
         public QueryParameters Params = new();
         public object Data;
-        public int Timeout = 0;
-        public BasicAuthenticationCredentials Auth; // TODO: Do something with this; test using https://httpbin.org/#/Auth
+        public int Timeout = 30;
+        public Credentials Auth;
         
         public ExpectedTypeOfResponse TypeOfResponseType = null;
         
