@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using KindMen.Uxios.ExpectedTypesOfResponse;
+using Newtonsoft.Json;
 using RSG;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -28,7 +30,7 @@ namespace KindMen.Uxios
         public void Preflight<TData>(Config config) where TData : class
         {
             config.TypeOfResponseType.AddResponseMetadataToConfig(config);
-            config.CreateUnityWebRequest<TData>();
+            CreateUnityWebRequest<TData>(config);
         }
 
         public Promise<Response> PerformRequest(Config config)
@@ -41,7 +43,39 @@ namespace KindMen.Uxios
 
             return promise;
         }
-        
+
+        private void CreateUnityWebRequest<TData>(Config config) where TData : class
+        {
+            var urlBuilder = new UriBuilder(!config.Url.IsAbsoluteUri ? new Uri(config.BaseUrl, config.Url) : config.Url);
+            urlBuilder.Query = QueryString.Merge(urlBuilder.Query.TrimStart('?'), config.Params.ToString());
+            var url = urlBuilder.Uri;
+
+            config.UnityWebRequest = new UnityWebRequest(url, config.Method.ToString());
+            config.UnityWebRequest.timeout = config.Timeout;
+            config.UnityWebRequest.redirectLimit = config.MaxRedirects;
+            config.UnityWebRequest.downloadHandler = config.DownloadHandler ?? config.TypeOfResponseType switch
+            {
+                TextureResponse responseType => new DownloadHandlerTexture(responseType.Readable),
+                _ => new DownloadHandlerBuffer()
+            };
+
+            var (contentType, bytes) = ConvertToByteArray<TData>(config.Data);
+            if (bytes != null)
+            {
+                config.UnityWebRequest.uploadHandler = new UploadHandlerRaw(bytes);
+            }
+
+            if (string.IsNullOrEmpty(contentType) == false)
+            {
+                config.UnityWebRequest.SetRequestHeader("Content-Type", contentType);
+            }
+
+            foreach (var header in config.Headers)
+            {
+                config.UnityWebRequest.SetRequestHeader(header.Key, header.Value);
+            }
+        }
+
         private IEnumerator DoRequest(Config config, Promise<Response> promise)
         {
             // TODO: Perform transforms for request and return a error promise if it fails
@@ -113,5 +147,34 @@ namespace KindMen.Uxios
                 promise.Reject(error);
             }
         }        
+
+        private (string contentType, byte[] bytes) ConvertToByteArray<T>(object data) where T : class
+        {
+            T dataToSend = data as T;
+            if (data == null)
+            {
+                return (null, null);
+            }
+            
+            if (dataToSend is byte[] asByteArray)
+            {
+                return ("application/octet-stream", bytes: asByteArray);
+            } 
+            
+            if (dataToSend is string asString)
+            {
+                return ("text/plain", bytes: System.Text.Encoding.UTF8.GetBytes(asString));
+            }
+            
+            if (dataToSend is object asObject)
+            {
+                // TODO: make setting configurable
+                var serializedString = JsonConvert.SerializeObject(asObject, typeof(T), null);
+                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(serializedString);
+                return ("application/json", bytes);
+            }
+
+            throw new Exception("Unable to determine how to convert this into a byte array");
+        }
     }
 }
