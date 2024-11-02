@@ -1,16 +1,12 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using QueryParameters = KindMen.Uxios.Http.QueryParameters;
 
-namespace KindMen.Uxios.Tests
+namespace KindMen.Uxios.Tests.HttpClient
 {
     public class GetRequests
     {
@@ -38,7 +34,7 @@ namespace KindMen.Uxios.Tests
 
             var promise = uxios.Get(url, config);
             
-            yield return Asserts.AssertPromiseSucceeds(
+            yield return PromiseAssertions.AssertPromiseSucceeds(
                 promise, 
                 AssertExampleHtmlWasReceived
             );
@@ -51,7 +47,7 @@ namespace KindMen.Uxios.Tests
 
             var promise = uxios.Get<string>(url);
 
-            yield return Asserts.AssertPromiseSucceeds(
+            yield return PromiseAssertions.AssertPromiseSucceeds(
                 promise, 
                 AssertExampleHtmlWasReceived
             );
@@ -65,7 +61,7 @@ namespace KindMen.Uxios.Tests
 
             var promise = uxios.Get<string>(relativeUrl, config);
 
-            yield return Asserts.AssertPromiseSucceeds(
+            yield return PromiseAssertions.AssertPromiseSucceeds(
                 promise, 
                 AssertExampleHtmlWasReceived
             );
@@ -78,7 +74,7 @@ namespace KindMen.Uxios.Tests
 
             var promise = uxios.Get<Texture2D>(url);
 
-            yield return Asserts.AssertPromiseSucceeds(
+            yield return PromiseAssertions.AssertPromiseSucceeds(
                 promise, 
                 response =>
                 {
@@ -95,7 +91,7 @@ namespace KindMen.Uxios.Tests
 
             var promise = uxios.Get<byte[]>(url);
             
-            yield return Asserts.AssertPromiseSucceeds(
+            yield return PromiseAssertions.AssertPromiseSucceeds(
                 promise, 
                 response =>
                 {
@@ -115,7 +111,7 @@ namespace KindMen.Uxios.Tests
 
             var promise = uxios.Get<string>(url);
 
-            yield return Asserts.AssertPromiseErrors(
+            yield return PromiseAssertions.AssertPromiseErrors(
                 promise, 
                 e =>
                 {
@@ -134,7 +130,7 @@ namespace KindMen.Uxios.Tests
 
             var promise = uxios.Get<ExamplePost>(url);
 
-            yield return Asserts.AssertPromiseSucceeds(
+            yield return PromiseAssertions.AssertPromiseSucceeds(
                 promise, 
                 response =>
                 {
@@ -153,7 +149,7 @@ namespace KindMen.Uxios.Tests
             // No indication of a return type means: untyped JSON.
             var promise = uxios.Get(url);
 
-            yield return Asserts.AssertPromiseSucceeds(
+            yield return PromiseAssertions.AssertPromiseSucceeds(
                 promise, 
                 response =>
                 {
@@ -170,79 +166,6 @@ namespace KindMen.Uxios.Tests
         }
 
         [UnityTest]
-        public IEnumerator GetsJsonAsCollectionOfObjects()
-        {
-            var url = new Uri("https://jsonplaceholder.typicode.com/posts");
-
-            var promise = uxios.Get<List<ExamplePost>>(url);
-            
-            yield return Asserts.AssertPromiseSucceeds(
-                promise, 
-                response =>
-                {
-                    var posts = AssertReceivedCollectionOfPosts(response, 100);
-
-                    AssertCanonicalPost(posts.First());
-                }
-            );
-        }
-
-        [UnityTest]
-        public IEnumerator GetsFilteredCollectionOfObjectsUsingArguments()
-        {
-            var url = new Uri("https://jsonplaceholder.typicode.com/posts");
-
-            var promise = uxios.Get<List<ExamplePost>>(url, new QueryParameters{ { "userId", "1" } });
-
-            yield return Asserts.AssertPromiseSucceeds(
-                promise, 
-                response =>
-                {
-                    var posts = AssertReceivedCollectionOfPosts(response, 10);
-
-                    AssertCanonicalPost(posts.First());
-                }
-            );
-        }
-
-        [UnityTest]
-        public IEnumerator GetsFilteredCollectionOfObjectsUsingQueryParametersOnTheUrl()
-        {
-            var url = new Uri("https://jsonplaceholder.typicode.com/posts?userId=1");
-
-            var promise = uxios.Get<List<ExamplePost>>(url);
-
-            yield return Asserts.AssertPromiseSucceeds(
-                promise, 
-                response =>
-                {
-                    var posts = AssertReceivedCollectionOfPosts(response, 10);
-
-                    AssertCanonicalPost(posts.First());
-                }
-            );
-        }
-
-        [UnityTest]
-        public IEnumerator GetsFilteredCollectionOfObjectsUsingParametersInTheConfig()
-        {
-            var url = new Uri("https://jsonplaceholder.typicode.com/posts");
-
-            var queryParameters = new QueryParameters{ { "userId", "1" } };
-            var config = new Config { Params = queryParameters };
-            var promise = uxios.Get<List<ExamplePost>>(url, config);
-            
-            yield return Asserts.AssertPromiseSucceeds(
-                promise, 
-                response =>
-                {
-                    var posts = AssertReceivedCollectionOfPosts(response, 10);
-                    AssertCanonicalPost(posts.First());
-                }
-            );
-        }
-
-        [UnityTest]
         public IEnumerator ErrorIfResponseCannotBeInterpretedAsJson()
         {
             // Start with a URL that returns an HTML response ... 
@@ -251,21 +174,10 @@ namespace KindMen.Uxios.Tests
             // ... and thus should fail because JSON is expected due to the use of a Generic
             var promise = uxios.Get<ExamplePost>(url);
 
-            yield return Asserts.AssertPromiseErrorsWithMessage(
+            yield return PromiseAssertions.AssertPromiseErrorsWithMessage(
                 promise, 
                 "Unable to parse response as JSON"
             );
-        }
-
-        private static List<ExamplePost> AssertReceivedCollectionOfPosts(Response response, int numberOfResults)
-        {
-            Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Data, Is.TypeOf<List<ExamplePost>>());
-            List<ExamplePost> posts = response.Data as List<ExamplePost>;
-            Assert.That(posts, Is.Not.Null);
-            Assert.That(posts, Has.Count.EqualTo(numberOfResults));
-        
-            return posts;
         }
 
         private void AssertExampleHtmlWasReceived(Response response)

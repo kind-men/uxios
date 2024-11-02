@@ -46,7 +46,7 @@ namespace KindMen.Uxios.Tests
 
             var promise = uxios.Get(url, config);
             
-            yield return Asserts.AssertPromiseSucceeds(
+            yield return PromiseAssertions.AssertPromiseSucceeds(
                 promise, 
                 response =>
                 {
@@ -73,7 +73,7 @@ namespace KindMen.Uxios.Tests
 
             var promise = uxios.Get(url, config);
             
-            yield return Asserts.AssertPromiseSucceeds(
+            yield return PromiseAssertions.AssertPromiseSucceeds(
                 promise, 
                 response =>
                 {
@@ -99,7 +99,7 @@ namespace KindMen.Uxios.Tests
 
             var promise = uxios.Get(new Uri("https://kind-men.com/404"), config);
             
-            yield return Asserts.AssertPromiseErrors(
+            yield return PromiseAssertions.AssertPromiseErrors(
                 promise,
                 (exception) =>
                 {

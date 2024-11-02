@@ -2,11 +2,10 @@
 using System.Collections;
 using NUnit.Framework;
 using RSG;
-using UnityEngine;
 
 namespace KindMen.Uxios.Tests
 {
-    public static class Asserts
+    public static class PromiseAssertions
     {
         public static IEnumerator AssertPromiseSucceeds(Promise<Response> promise, Action<Response> onSuccess)
         {
