@@ -2,6 +2,7 @@
 using System.Net.Http;
 using RSG;
 using UnityEngine;
+using QueryParameters = KindMen.Uxios.Http.QueryParameters;
 
 namespace KindMen.Uxios
 {
@@ -56,6 +57,16 @@ namespace KindMen.Uxios
             return Request<byte[]>(clone);
         }
 
+        public Promise<Response> Get(Uri url, QueryParameters parameters, Config config = null)
+        {
+            config ??= this.defaultConfig;
+
+            var clone = config.Clone() as Config;
+            clone!.Params = parameters;
+
+            return Get(url, clone);
+        }
+
         public Promise<Response> Get<TResponse>(Uri url, Config config = null)
         {
             config ??= this.defaultConfig;
@@ -66,6 +77,16 @@ namespace KindMen.Uxios
             clone!.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(clone);
 
             return Request<byte[]>(clone);
+        }
+
+        public Promise<Response> Get<TResponse>(Uri url, QueryParameters parameters, Config config = null)
+        {
+            config ??= this.defaultConfig;
+
+            var clone = config.Clone() as Config;
+            clone!.Params = parameters;
+
+            return Get<TResponse>(url, clone);
         }
 
         public Promise<Response> Delete(Uri url, Config config = null)
