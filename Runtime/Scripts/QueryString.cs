@@ -93,5 +93,45 @@ namespace KindMen.Uxios
             }
             return collection;
         }
+
+        public static string Merge(string source, string mergeOnto)
+        {
+            return Encode(Merge(Decode(source), Decode(mergeOnto)));
+        }
+
+        public static string Merge(string source, NameValueCollection mergeOnto)
+        {
+            return Encode(Merge(Decode(source), mergeOnto));
+        }
+
+        public static NameValueCollection Merge(NameValueCollection source, string mergeOnto)
+        {
+            return Merge(source, Decode(mergeOnto));
+        }
+
+        public static NameValueCollection Merge(NameValueCollection source, NameValueCollection mergeOnto)
+        {
+            var result = new NameValueCollection();
+
+            // Add all keys from the first collection
+            foreach (string key in source)
+            {
+                foreach (var value in source.GetValues(key))
+                {
+                    result.Add(key, value);
+                }
+            }
+
+            // Add keys from the second collection, merging values for duplicate keys
+            foreach (string key in mergeOnto)
+            {
+                foreach (var value in mergeOnto.GetValues(key))
+                {
+                    result.Add(key, value);
+                }
+            }
+
+            return result;
+        }
     }
 }

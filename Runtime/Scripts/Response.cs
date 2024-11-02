@@ -20,7 +20,9 @@ namespace KindMen.Uxios
 
         public Response(Config config)
         {
+            // TODO: Move this to WebRequestRunner and make the Response a clean data object
             var webRequest = config.UnityWebRequest;
+
             // TODO: Check status of UnityWebRequest if it is done
             
             // TODO apply transformation according to config.responseType and then config.Transforms

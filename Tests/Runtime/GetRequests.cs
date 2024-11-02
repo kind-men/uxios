@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -111,7 +113,7 @@ namespace KindMen.Uxios.Tests
         }
 
         // TODO: Add more error scenario's, such as CORS, DNS not found, timeout (difficult one to test) and 
-        //       a Unity DataProcessingError (trying to load a JSON as a Texture I think)
+        //       a Unity DataProcessingError (trying to load a JSON as a Texture I think); use https://httpbin.org/
         [UnityTest]
         public IEnumerator CannotFindUrl()
         {
@@ -175,7 +177,59 @@ namespace KindMen.Uxios.Tests
             var promise = uxios.Get(url);
             yield return Asserts.AssertPromiseSucceeds(promise, onSuccess);
         }
-        
+
+        [UnityTest]
+        public IEnumerator GetsJsonAsCollectionOfObjects()
+        {
+            var uxios = new Uxios();
+            var url = new Uri("https://jsonplaceholder.typicode.com/posts");
+
+            Action<Response> onSuccess = response =>
+            {
+                Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
+                Assert.That(response.Data, Is.TypeOf<List<ExamplePost>>());
+                List<ExamplePost> posts = response.Data as List<ExamplePost>;
+                Assert.That(posts, Is.Not.Null);
+                Assert.That(posts, Has.Count.EqualTo(100));
+
+                var post = posts.First();
+                Assert.That(post, Is.Not.Null);
+                Assert.That(post.id, Is.EqualTo(1));
+                Assert.That(post.userId, Is.EqualTo(1));
+                Assert.That(post.title, Is.EqualTo("sunt aut facere repellat provident occaecati excepturi optio reprehenderit"));
+                Assert.That(post.body, Is.EqualTo("quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"));
+            };
+
+            var promise = uxios.Get<List<ExamplePost>>(url);
+            yield return Asserts.AssertPromiseSucceeds(promise, onSuccess);
+        }
+
+        [UnityTest]
+        public IEnumerator GetsJsonAsFilteredCollectionOfObjectsUsingQueryParametersOnTheUrl()
+        {
+            var uxios = new Uxios();
+            var url = new Uri("https://jsonplaceholder.typicode.com/posts?userId=1");
+
+            Action<Response> onSuccess = response =>
+            {
+                Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
+                Assert.That(response.Data, Is.TypeOf<List<ExamplePost>>());
+                List<ExamplePost> posts = response.Data as List<ExamplePost>;
+                Assert.That(posts, Is.Not.Null);
+                Assert.That(posts, Has.Count.EqualTo(10)); // when filtering on userId, you only get 10
+
+                var post = posts.First();
+                Assert.That(post, Is.Not.Null);
+                Assert.That(post.id, Is.EqualTo(1));
+                Assert.That(post.userId, Is.EqualTo(1));
+                Assert.That(post.title, Is.EqualTo("sunt aut facere repellat provident occaecati excepturi optio reprehenderit"));
+                Assert.That(post.body, Is.EqualTo("quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"));
+            };
+
+            var promise = uxios.Get<List<ExamplePost>>(url);
+            yield return Asserts.AssertPromiseSucceeds(promise, onSuccess);
+        }
+
         // TODO: Add case and solution for query parameters / https://jsonplaceholder.typicode.com/guide/#filtering-resources
 
         [UnityTest]

@@ -24,26 +24,29 @@ namespace KindMen.Uxios
         public List<RequestTransformer> TransformRequest = new(); // TODO: Do something with this
         public List<ResponseTransformer> TransformResponse = new(); // TODO: Do something with this
         public Headers Headers = new();
-        public QueryParameters Params = new(); // TODO: Do something with this
+        public QueryParameters Params = new();
         public object Data;
         public int Timeout = 0;
-        public BasicAuthenticationCredentials Auth; // TODO: Do something with this
+        public BasicAuthenticationCredentials Auth; // TODO: Do something with this; test using https://httpbin.org/#/Auth
         
         public ExpectedTypeOfResponse TypeOfResponseType = null;
         
         public Func<HttpStatusCode, bool> ValidateStatus = status => (int)status >= 200 && (int)status < 300;
-        public int MaxRedirects = 5;
+        public int MaxRedirects = 5; // TODO: Test using https://httpbin.org/#/Redirects/get_absolute_redirect__n_
         public CancellationToken CancelToken;
         #endregion
         
         #region Unity specific fields
         public DownloadHandler DownloadHandler;
         internal UnityWebRequest UnityWebRequest;
+
         #endregion
 
         public void CreateUnityWebRequest<TData>() where TData : class
         {
-            var url = !Url.IsAbsoluteUri ? new Uri(BaseUrl, Url) : Url;
+            var urlBuilder = new UriBuilder(!Url.IsAbsoluteUri ? new Uri(BaseUrl, Url) : Url);
+            urlBuilder.Query = QueryString.Merge(urlBuilder.Query.TrimStart('?'), Params.ToString());
+            var url = urlBuilder.Uri;
 
             UnityWebRequest = new UnityWebRequest(url, Method.ToString());
             UnityWebRequest.timeout = Timeout;
