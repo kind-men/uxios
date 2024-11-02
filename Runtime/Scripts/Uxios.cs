@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-using KindMen.Uxios.Interceptors;
-using Newtonsoft.Json.Linq;
 using RSG;
 using UnityEngine;
 
@@ -13,24 +11,36 @@ namespace KindMen.Uxios
 
         private readonly IRequestRunner requestRunner;
         private readonly Config defaultConfig;
+        private readonly ExpectedTypeOfResponseResolver expectedTypeOfResponseResolver;
 
-        public Uxios()
-        {
-            this.defaultConfig = new Config();
-            
-            // The default runner, but you could use a different one if you want
-            requestRunner = WebRequestRunner.Instance();
+        /// <summary>
+        /// Default constructor - when all you need is to make HTTP Requests.
+        /// </summary>
+        public Uxios() : this(config: new Config()) {
         }
 
-        public Uxios(IRequestRunner requestRunner)
-        {
-            this.defaultConfig = new Config();
-            this.requestRunner = requestRunner;
+        /// <summary>
+        /// Advanced Constructor - when you want to pass a default config or even your own custom services for
+        /// customizing Uxios' interactions or response resolving.
+        /// </summary>
+        public Uxios(
+            Config config,
+            IRequestRunner requestRunner = null, 
+            ExpectedTypeOfResponseResolver expectedTypeOfResponseResolver = null
+        ) {
+            this.defaultConfig = config;
+            this.requestRunner = requestRunner ?? WebRequestRunner.Instance();
+            this.expectedTypeOfResponseResolver = expectedTypeOfResponseResolver ?? new ExpectedTypeOfResponseResolver();
         }
 
-        public Promise<Response> Request<TData>(Config config) where TData : class
+        public Promise<Response> Request<TData>(Config config = null) where TData : class
         {
-            config.CreateUnityWebRequest<TData>();
+            config ??= this.defaultConfig.Clone() as Config;
+
+            // When the user or none of the other methods set a response type, grab the default one from the resolver
+            config!.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve(config); 
+
+            requestRunner.Preflight<TData>(config);
             
             return requestRunner.PerformRequest(config);
         }
@@ -53,20 +63,9 @@ namespace KindMen.Uxios
             var clone = config.Clone() as Config;
             clone!.Url = url;
             clone!.Method = HttpMethod.Get;
-            clone!.ResponseType = ResolveExpectedResponseBasedOnType<TResponse>();
+            clone!.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(clone);
 
             return Request<byte[]>(clone);
-        }
-
-        private ExpectedResponse ResolveExpectedResponseBasedOnType<T>()
-        {
-            // TODO: is this the right location? Should it even be a separate service?
-            if (typeof(T) == typeof(Texture2D)) return ExpectedResponse.Texture();
-            if (typeof(T) == typeof(string)) return ExpectedResponse.Text();
-            if (typeof(T) == typeof(JObject)) return ExpectedResponse.Json();
-            if (typeof(T) == typeof(byte[])) return ExpectedResponse.ArrayBuffer();
-            
-            return ExpectedResponse.Json(typeof(T));
         }
 
         public Promise<Response> Delete(Uri url, Config config = null)
@@ -124,7 +123,7 @@ namespace KindMen.Uxios
             clone!.Url = url;
             clone!.Method = HttpMethod.Post;
             clone!.Data = data;
-            clone!.ResponseType = ResolveExpectedResponseBasedOnType<TResponse>();
+            clone!.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(clone);
 
             return Request<TRequestData>(clone);
         }
@@ -151,7 +150,7 @@ namespace KindMen.Uxios
             clone!.Url = url;
             clone!.Method = HttpMethod.Put;
             clone!.Data = data;
-            clone!.ResponseType = ResolveExpectedResponseBasedOnType<TResponse>();
+            clone!.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(clone);
 
             return Request<TRequestData>(clone);
         }
@@ -178,7 +177,7 @@ namespace KindMen.Uxios
             clone!.Url = url;
             clone!.Method = HttpMethod.Patch;
             clone!.Data = data;
-            clone!.ResponseType = ResolveExpectedResponseBasedOnType<TResponse>();
+            clone!.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(clone);
 
             return Request<TRequestData>(clone);
         }

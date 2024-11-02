@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+using KindMen.Uxios.ExpectedTypesOfResponse;
 using KindMen.Uxios.Http;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
@@ -28,7 +29,7 @@ namespace KindMen.Uxios
         public int Timeout = 0;
         public BasicAuthenticationCredentials Auth; // TODO: Do something with this
         
-        public ExpectedResponse ResponseType = ExpectedResponse.Json();
+        public ExpectedTypeOfResponse TypeOfResponseType = null;
         
         public Func<HttpStatusCode, bool> ValidateStatus = status => (int)status >= 200 && (int)status < 300;
         public int MaxRedirects = 5;
@@ -47,9 +48,9 @@ namespace KindMen.Uxios
             UnityWebRequest = new UnityWebRequest(url, Method.ToString());
             UnityWebRequest.timeout = Timeout;
             UnityWebRequest.redirectLimit = MaxRedirects;
-            UnityWebRequest.downloadHandler = DownloadHandler ?? ResponseType switch
+            UnityWebRequest.downloadHandler = DownloadHandler ?? TypeOfResponseType switch
             {
-                ExpectTextureResponse responseType => new DownloadHandlerTexture(responseType.Readable),
+                TextureResponse responseType => new DownloadHandlerTexture(responseType.Readable),
                 _ => new DownloadHandlerBuffer()
             };
 
@@ -113,7 +114,7 @@ namespace KindMen.Uxios
                 Data = Data,
                 Timeout = Timeout,
                 Auth = Auth,
-                ResponseType = ResponseType,
+                TypeOfResponseType = TypeOfResponseType,
                 ValidateStatus = ValidateStatus,
                 MaxRedirects = MaxRedirects,
                 CancelToken = CancelToken,

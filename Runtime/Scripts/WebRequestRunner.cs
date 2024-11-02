@@ -25,6 +25,11 @@ namespace KindMen.Uxios
             return webRequestRunner;
         }
 
+        public void Preflight<TData>(Config config) where TData : class
+        {
+            config.CreateUnityWebRequest<TData>();
+        }
+
         public Promise<Response> PerformRequest(Config config)
         {
             var promise = new Promise<Response>();

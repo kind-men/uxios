@@ -21,9 +21,9 @@ namespace KindMen.Uxios.Tests
         [UnityTest]
         public IEnumerator GetsWebpageAsString()
         {
-            var uxios = new KindMen.Uxios.Uxios();
+            var uxios = new Uxios();
             var url = new Uri("https://kind-men.com");
-            var config = new Config { ResponseType = ExpectedResponse.Text() };
+            var config = new Config { TypeOfResponseType = ExpectedTypeOfResponse.Text() };
 
             var promise = uxios.Get(url, config);
             
@@ -41,7 +41,7 @@ namespace KindMen.Uxios.Tests
         [UnityTest]
         public IEnumerator GetsWebpageAsStringUsingGenericShorthand()
         {
-            var uxios = new KindMen.Uxios.Uxios();
+            var uxios = new Uxios();
             var url = new Uri("https://kind-men.com");
 
             var promise = uxios.Get<string>(url);
@@ -59,7 +59,7 @@ namespace KindMen.Uxios.Tests
         [UnityTest]
         public IEnumerator GetsWebpageBasedOnRelativeUrl()
         {
-            var uxios = new KindMen.Uxios.Uxios();
+            var uxios = new Uxios();
             var config = new Config { BaseUrl = new Uri("https://kind-men.com") };
             var relativeUrl = new Uri("2016/01/22/launching-our-new-website/", UriKind.Relative);
 
@@ -78,7 +78,7 @@ namespace KindMen.Uxios.Tests
         [UnityTest]
         public IEnumerator GetsImageAsTexture()
         {
-            var uxios = new KindMen.Uxios.Uxios();
+            var uxios = new Uxios();
             var url = new Uri("https://kind-men.com/wp-content/uploads//sites/7/2020/06/us.png");
 
             var promise = uxios.Get<Texture2D>(url);
@@ -95,7 +95,7 @@ namespace KindMen.Uxios.Tests
         [UnityTest]
         public IEnumerator GetsImageAsByteArray()
         {
-            var uxios = new KindMen.Uxios.Uxios();
+            var uxios = new Uxios();
             var url = new Uri("https://kind-men.com/wp-content/uploads//sites/7/2020/06/us.png");
 
             Action<Response> onSuccess = response =>
@@ -134,7 +134,7 @@ namespace KindMen.Uxios.Tests
         [UnityTest]
         public IEnumerator GetsJsonAsTypedObject()
         {
-            var uxios = new KindMen.Uxios.Uxios();
+            var uxios = new Uxios();
             var url = new Uri("https://jsonplaceholder.typicode.com/posts/1");
 
             Action<Response> onSuccess = response =>
@@ -156,7 +156,7 @@ namespace KindMen.Uxios.Tests
         [UnityTest]
         public IEnumerator GetsJsonAsUntypedObject()
         {
-            var uxios = new KindMen.Uxios.Uxios();
+            var uxios = new Uxios();
             var url = new Uri("https://jsonplaceholder.typicode.com/posts/1");
 
             Action<Response> onSuccess = response =>
@@ -181,7 +181,7 @@ namespace KindMen.Uxios.Tests
         [UnityTest]
         public IEnumerator ErrorIfResponseCannotBeInterpretedAsJson()
         {
-            var uxios = new KindMen.Uxios.Uxios();
+            var uxios = new Uxios();
             
             // Start with a URL that returns an HTML response ... 
             var url = new Uri("https://kind-men.com");

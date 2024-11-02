@@ -31,7 +31,7 @@ namespace KindMen.Uxios.Tests
 
             // All interceptor tests basically use the same settings
             url = new Uri("https://kind-men.com");
-            config = new Config { ResponseType = ExpectedResponse.Text() };
+            config = new Config { TypeOfResponseType = ExpectedTypeOfResponse.Text() };
         }
 
         [UnityTest]

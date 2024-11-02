@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using KindMen.Uxios.ExpectedTypesOfResponse;
 using KindMen.Uxios.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -23,12 +24,12 @@ namespace KindMen.Uxios
             // TODO: Check status of UnityWebRequest if it is done
             
             // TODO apply transformation according to config.responseType and then config.Transforms
-            Data = config.ResponseType switch
+            Data = config.TypeOfResponseType switch
             {
-                ExpectJsonResponse expectedResponse => AsJsonObject(webRequest, expectedResponse),
-                ExpectTextResponse _ => webRequest.downloadHandler.text,
-                ExpectArrayBufferResponse _ => webRequest.downloadHandler.data,
-                ExpectTextureResponse _ => AsTexture(webRequest),
+                JsonResponse expectedResponse => AsJsonObject(webRequest, expectedResponse),
+                TextResponse _ => webRequest.downloadHandler.text,
+                ArrayBufferResponse _ => webRequest.downloadHandler.data,
+                TextureResponse _ => AsTexture(webRequest),
                 _ => webRequest.downloadHandler.data
             };
 
@@ -52,13 +53,12 @@ namespace KindMen.Uxios
             return webRequestDownloadHandler.texture;
         }
 
-        private static object AsJsonObject(UnityWebRequest webRequest, ExpectJsonResponse expectedResponse)
+        private static object AsJsonObject(UnityWebRequest webRequest, JsonResponse expectedResponse)
         {
             var jsonText = webRequest.downloadHandler.text;
             var expectedType = expectedResponse.DeserializeAs;
             var settings = expectedResponse.Settings;
 
-            Debug.Log(jsonText);
             object asJsonObject;
             try
             {
