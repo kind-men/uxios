@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
+using KindMen.Uxios.Errors;
 using KindMen.Uxios.ExpectedTypesOfResponse;
 using KindMen.Uxios.Http;
 using Newtonsoft.Json;
 using RSG;
 using UnityEngine;
 using UnityEngine.Networking;
+using DataProcessingError = KindMen.Uxios.Errors.DataProcessingError;
 using QueryParameters = KindMen.Uxios.Http.QueryParameters;
 
 namespace KindMen.Uxios
@@ -91,10 +93,14 @@ namespace KindMen.Uxios
                 yield return null;
             }
 
-            // something in the request's connection went wrong
             if (request.result is UnityWebRequest.Result.ConnectionError or UnityWebRequest.Result.DataProcessingError)
             {
-                var error = new Error(request.error, config, null);
+                Error error = request.result switch
+                {
+                    UnityWebRequest.Result.DataProcessingError => new DataProcessingError(request.error, config, null),
+                    _ => new ConnectionError(request.error, config, null)
+                };
+
                 foreach (var requestInterceptor in Uxios.Interceptors.request)
                 {
                     error = requestInterceptor.error.Invoke(error);
@@ -107,11 +113,17 @@ namespace KindMen.Uxios
             // If an exception occurs in the whole response interpretation chain, reject the promise
             try
             {
-                var response = new UnityWebResponse(config, request);
+                Response response = new UnityWebResponse(config, request);
 
-                if (response.IsValid() == false) 
+                if (response.IsValid() == false)
                 {
-                    var error = new Error((string)response.Data, config, response);
+                    Error error = (int)response.Status switch
+                    {
+                        >= 400 and < 500 => new HttpClientError((string)response.Data, config, response),
+                        >= 500 and < 600 => new HttpServerError((string)response.Data, config, response),
+                        _ => new ProtocolError((string)response.Data, config, response)
+                    };
+
                     foreach (var responseInterceptor in Uxios.Interceptors.response)
                     {
                         error = responseInterceptor.error.Invoke(error);
@@ -123,7 +135,7 @@ namespace KindMen.Uxios
 
                 foreach (var responseInterceptor in Uxios.Interceptors.response)
                 {
-                    response = responseInterceptor.success.Invoke(response) as UnityWebResponse;
+                    response = responseInterceptor.success.Invoke(response);
                 }
                 
                 promise.Resolve(response);
