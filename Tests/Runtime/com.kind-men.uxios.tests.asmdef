@@ -1,10 +1,10 @@
 {
-    "name": "PlayModeTests",
+    "name": "com.kind-men.uxios.tests",
     "rootNamespace": "KindMen.Uxios.Tests",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "com.kindmen.uxios"
+        "com.kind-men.uxios"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

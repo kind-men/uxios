@@ -1,5 +1,5 @@
-﻿{
-  "name": "com.kindmen.uxios",
+{
+  "name": "com.kind-men.uxios",
   "version": "0.1.0",
   "displayName": "Uxios",
   "description": "A Unity-native, Axios-inspired HTTP client for streamlined, typed, and extensible networking across platforms.",
@@ -7,8 +7,7 @@
   "documentationUrl": "https://github.com/kind-men/uxios/blob/main/README.md",
   "changelogUrl": "https://github.com/kind-men/uxios/blob/main/CHANGELOG.md",
   "licensesUrl": "https://github.com/kind-men/uxios/blob/main/LICENSE",
-  "keywords": [
-  ],
+  "keywords": [],
   "author": {
     "name": "Mike van Riel",
     "url": "https://www.kind-men.com"
@@ -16,6 +15,6 @@
   "dependencies": {
     "com.unity.modules.unitywebrequest": "1.0.0",
     "com.unity.nuget.newtonsoft-json": "3.2.0",
-    "com.rsg.promise":  "3.0.1"
+    "com.rsg.promise": "3.0.1"
   }
 }

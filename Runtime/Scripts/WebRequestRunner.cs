@@ -27,6 +27,7 @@ namespace KindMen.Uxios
 
         public void Preflight<TData>(Config config) where TData : class
         {
+            config.TypeOfResponseType.AddResponseMetadataToConfig(config);
             config.CreateUnityWebRequest<TData>();
         }
 
