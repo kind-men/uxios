@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using RSG;
 using UnityEngine;
 using UnityEngine.Networking;
+using QueryParameters = KindMen.Uxios.Http.QueryParameters;
 
 namespace KindMen.Uxios
 {
@@ -28,64 +29,49 @@ namespace KindMen.Uxios
             return webRequestRunner;
         }
 
-        public void Preflight<TData>(Config config) where TData : class
-        {
-            config.TypeOfResponseType.AddResponseMetadataToConfig(config);
-            CreateUnityWebRequest<TData>(config);
-        }
-
-        public Promise<Response> PerformRequest(Config config)
+        public Promise<Response> PerformRequest<TData>(Config config) where TData : class
         {
             var promise = new Promise<Response>();
             
             // We don't need to store the coroutine reference because the cancellation token in the 
             // config will self-abort the coroutine if it needs to be cancelled
-            StartCoroutine(DoRequest(config, promise));
+            StartCoroutine(DoRequest<TData>(config, promise));
 
             return promise;
         }
 
-        private void CreateUnityWebRequest<TData>(Config config) where TData : class
+        private UnityWebRequest ConvertToUnityWebRequest(Config config, byte[] bytes)
         {
-            var urlBuilder = new UriBuilder(!config.Url.IsAbsoluteUri ? new Uri(config.BaseUrl, config.Url) : config.Url);
-            urlBuilder.Query = QueryString.Merge(urlBuilder.Query.TrimStart('?'), config.Params.ToString());
-            var url = urlBuilder.Uri;
+            // Attach all params to the URL for UnityWebRequest
+            var url = new UriBuilder(config.Url) { Query = config.Params.ToString() }.Uri;
 
-            config.UnityWebRequest = new UnityWebRequest(url, config.Method.ToString());
-            config.UnityWebRequest.timeout = config.Timeout;
-            config.UnityWebRequest.redirectLimit = config.MaxRedirects;
-            config.UnityWebRequest.downloadHandler = config.DownloadHandler ?? config.TypeOfResponseType switch
+            var wr = new UnityWebRequest(url, config.Method.ToString());
+            wr.timeout = config.Timeout;
+            wr.redirectLimit = config.MaxRedirects;
+            wr.downloadHandler = config.TypeOfResponseType switch
             {
                 TextureResponse responseType => new DownloadHandlerTexture(responseType.Readable),
                 _ => new DownloadHandlerBuffer()
             };
-
-            var (contentType, bytes) = ConvertToByteArray<TData>(config.Data);
-            if (bytes != null)
-            {
-                config.UnityWebRequest.uploadHandler = new UploadHandlerRaw(bytes);
-            }
-
-            if (config.Auth is BasicAuthenticationCredentials credentials)
-            {
-                config.UnityWebRequest.SetRequestHeader("Authorization", credentials.ToAuthorizationToken());
-            }
-            
-            if (string.IsNullOrEmpty(contentType) == false)
-            {
-                config.UnityWebRequest.SetRequestHeader("Content-Type", contentType);
-            }
+            wr.uploadHandler = new UploadHandlerRaw(bytes ?? new byte[]{});
 
             foreach (var header in config.Headers)
             {
-                config.UnityWebRequest.SetRequestHeader(header.Key, header.Value);
+                wr.SetRequestHeader(header.Key, header.Value);
             }
+
+            return wr;
         }
 
-        private IEnumerator DoRequest(Config config, Promise<Response> promise)
+        private IEnumerator DoRequest<TData>(Config config, Promise<Response> promise) where TData : class
         {
-            // TODO: Perform transforms for request and return a error promise if it fails
-            var request = config.UnityWebRequest;
+            // Clone config so that any changes we do - do not affect the caller; as this may mess with the global
+            // config if that is used
+            config = config.Clone() as Config;
+
+            var bytes = NormalizeConfigAndReturnByteArray<TData>(config);
+
+            var request = ConvertToUnityWebRequest(config, bytes);
 
             foreach (var requestInterceptor in Uxios.Interceptors.request)
             {
@@ -121,7 +107,7 @@ namespace KindMen.Uxios
             // If an exception occurs in the whole response interpretation chain, reject the promise
             try
             {
-                var response = new Response(config);
+                var response = new UnityWebResponse(config, request);
 
                 if (response.IsValid() == false) 
                 {
@@ -137,7 +123,7 @@ namespace KindMen.Uxios
 
                 foreach (var responseInterceptor in Uxios.Interceptors.response)
                 {
-                    response = responseInterceptor.success.Invoke(response);
+                    response = responseInterceptor.success.Invoke(response) as UnityWebResponse;
                 }
                 
                 promise.Resolve(response);
@@ -152,7 +138,33 @@ namespace KindMen.Uxios
 
                 promise.Reject(error);
             }
-        }        
+        }
+
+        private byte[] NormalizeConfigAndReturnByteArray<TData>(Config config) where TData : class
+        {
+            // Make URI an absolute Uri for easy handling
+            var urlBuilder = new UriBuilder(!config.Url.IsAbsoluteUri ? new Uri(config.BaseUrl, config.Url) : config.Url);
+            // Move any query parameters from the URL to the Params collection ...
+            config.Params = new QueryParameters(QueryString.Merge(urlBuilder.Query.TrimStart('?'), config.Params.ToString()));
+            // ... meaning that the query part of the URI becomes empty
+            urlBuilder.Query = "";
+            // Overwrite URI
+            config.Url = urlBuilder.Uri;
+
+            config.TypeOfResponseType.AddResponseMetadataToConfig(config);
+            if (config.Auth is BasicAuthenticationCredentials credentials)
+            {
+                config.Headers.TryAdd("Authorization", credentials.ToAuthorizationToken());
+            }
+            
+            var (contentType, bytes) = ConvertToByteArray<TData>(config.Data);
+            if (string.IsNullOrEmpty(contentType) == false)
+            {
+                config.Headers.TryAdd("Content-Type", contentType);
+            }
+
+            return bytes;
+        }
 
         private (string contentType, byte[] bytes) ConvertToByteArray<T>(object data) where T : class
         {

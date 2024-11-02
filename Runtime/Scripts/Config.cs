@@ -33,20 +33,14 @@ namespace KindMen.Uxios
         public int MaxRedirects = 5;
         public CancellationToken CancelToken;
         #endregion
-        
-        #region Unity specific fields
-        public DownloadHandler DownloadHandler;
-        internal UnityWebRequest UnityWebRequest;
-
-        #endregion
 
         public object Clone()
         {
             return new Config
             {
-                Url = Url != null ? new UriBuilder(Url).Uri : null,
+                Url = Url,
                 Method = Method,
-                BaseUrl = BaseUrl != null ? new UriBuilder(BaseUrl).Uri : null,
+                BaseUrl = BaseUrl,
                 TransformRequest = TransformRequest.ToList(),
                 TransformResponse = TransformResponse.ToList(),
                 Headers = new Headers(Headers),
@@ -57,8 +51,7 @@ namespace KindMen.Uxios
                 TypeOfResponseType = TypeOfResponseType,
                 ValidateStatus = ValidateStatus,
                 MaxRedirects = MaxRedirects,
-                CancelToken = CancelToken,
-                DownloadHandler = DownloadHandler
+                CancelToken = CancelToken
             };
         }
     }

@@ -41,9 +41,7 @@ namespace KindMen.Uxios
             // When the user or none of the other methods set a response type, grab the default one from the resolver
             config!.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve(config); 
 
-            requestRunner.Preflight<TData>(config);
-            
-            return requestRunner.PerformRequest(config);
+            return requestRunner.PerformRequest<TData>(config);
         }
 
         public Promise<Response> Get(Uri url, Config config = null)
