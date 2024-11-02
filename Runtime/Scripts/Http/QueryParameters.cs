@@ -1,5 +1,4 @@
 ﻿using System.Collections.Specialized;
-using JetBrains.Annotations;
 
 namespace KindMen.Uxios.Http
 {
@@ -11,6 +10,16 @@ namespace KindMen.Uxios.Http
 
         public QueryParameters(QueryParameters col) : base(col)
         {
+        }
+
+        public QueryParameters(string queryParameters)
+        {
+            this.Add(QueryString.Decode(queryParameters));
+        }
+
+        public override string ToString()
+        {
+            return QueryString.Encode(this);
         }
     }
 }
