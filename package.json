@@ -12,6 +12,10 @@
     "name": "Mike van Riel",
     "url": "https://www.kind-men.com"
   },
+  "scripts": {
+    "docs-windows": "docker run --rm -it -p 8000:8000 -v %INIT_CWD%:/docs squidfunk/mkdocs-material",
+    "docs": "docker run --rm -it -p 8000:8000 -v $INIT_CWD:/docs squidfunk/mkdocs-material"
+  },
   "dependencies": {
     "com.unity.modules.unitywebrequest": "1.0.0",
     "com.unity.nuget.newtonsoft-json": "3.2.0",
