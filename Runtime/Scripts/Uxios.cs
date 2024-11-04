@@ -8,11 +8,19 @@ namespace KindMen.Uxios
 {
     public sealed class Uxios
     {
+        private static Uxios defaultInstance;
         public static Interceptors.Interceptors Interceptors { get; } = new();
 
         private readonly IRequestRunner requestRunner;
         private readonly Config defaultConfig;
         private readonly ExpectedTypeOfResponseResolver expectedTypeOfResponseResolver;
+
+        /// <summary>
+        /// Although it is recommended to inject an Uxios instance where you need it, you can also access a global
+        /// DefaultInstance. This is mostly used internally by the Resource and Collection object proxies, but if needed
+        /// others could use this too.
+        /// </summary>
+        public static Uxios DefaultInstance => defaultInstance ??= new Uxios();
 
         /// <summary>
         /// Default constructor - when all you need is to make HTTP Requests.
@@ -213,7 +221,7 @@ namespace KindMen.Uxios
         /// </summary>
         /// <param name="request">The promise to wait for</param>
         /// <returns>Custom yield instruction - this method can be as as part of a `yield return` clause</returns>
-        public static CustomYieldInstruction WaitForRequest(Promise<Response> request)
+        public static CustomYieldInstruction WaitForRequest<TResponse>(Promise<TResponse> request)
         {
             return new WaitUntil(() => request.CurState != PromiseState.Pending);
         }

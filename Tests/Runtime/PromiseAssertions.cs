@@ -7,13 +7,18 @@ namespace KindMen.Uxios.Tests
 {
     public static class PromiseAssertions
     {
-        public static IEnumerator AssertPromiseSucceeds(Promise<Response> promise, Action<Response> onSuccess)
+        public static IEnumerator AssertPromiseSucceeds<TResponse>(Promise<TResponse> promise, Action<TResponse> onSuccess)
         {
             return AssertPromise(
                 promise,
                 onSuccess,
                 e => Assert.Fail("An error should not have occurred, received: " + e.Message)
             );
+        }
+
+        public static IEnumerator AssertPromiseSucceeds(Promise<Response> promise, Action<Response> onSuccess)
+        {
+            return AssertPromiseSucceeds(promise, onSuccess);
         }
 
         public static IEnumerator AssertPromiseErrorsWithMessage(Promise<Response> promise, string startsWith)
@@ -34,9 +39,9 @@ namespace KindMen.Uxios.Tests
             Assert.Fail("It was not expected for this to succeed, received: " + response?.Data);
         }
 
-        private static IEnumerator AssertPromise(
-            Promise<Response> promise,
-            Action<Response> onSuccess,
+        private static IEnumerator AssertPromise<TResponse>(
+            Promise<TResponse> promise,
+            Action<TResponse> onSuccess,
             Action<Exception> onError
         )
         {
