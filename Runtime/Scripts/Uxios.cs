@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using KindMen.Uxios.Transports;
 using RSG;
 using UnityEngine;
 using QueryParameters = KindMen.Uxios.Http.QueryParameters;
@@ -11,7 +12,7 @@ namespace KindMen.Uxios
         private static Uxios defaultInstance;
         public static Interceptors.Interceptors Interceptors { get; } = new();
 
-        private readonly IRequestRunner requestRunner;
+        private readonly IUxiosTransport uxiosTransport;
         private readonly Config defaultConfig;
         private readonly ExpectedTypeOfResponseResolver expectedTypeOfResponseResolver;
 
@@ -34,11 +35,11 @@ namespace KindMen.Uxios
         /// </summary>
         public Uxios(
             Config config,
-            IRequestRunner requestRunner = null, 
+            IUxiosTransport transport = null, 
             ExpectedTypeOfResponseResolver expectedTypeOfResponseResolver = null
         ) {
             this.defaultConfig = config;
-            this.requestRunner = requestRunner ?? WebRequestRunner.Instance();
+            this.uxiosTransport = transport ?? UnityWebRequestTransport.Instance();
             this.expectedTypeOfResponseResolver = expectedTypeOfResponseResolver ?? new ExpectedTypeOfResponseResolver();
         }
 
@@ -49,7 +50,7 @@ namespace KindMen.Uxios
             // When the user or none of the other methods set a response type, grab the default one from the resolver
             config!.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve(config); 
 
-            return requestRunner.PerformRequest<TData>(config);
+            return uxiosTransport.PerformRequest<TData>(config);
         }
 
         public Promise<Response> Get(Uri url, Config config = null)

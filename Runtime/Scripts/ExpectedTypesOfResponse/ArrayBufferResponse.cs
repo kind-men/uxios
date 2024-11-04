@@ -4,9 +4,9 @@ namespace KindMen.Uxios.ExpectedTypesOfResponse
 {
     public sealed class ArrayBufferResponse : ExpectedTypeOfResponse
     {
-        public override void AddResponseMetadataToConfig(Config config)
+        public override void AddMetadataToRequest(Request request)
         {
-            config.Headers.TryAdd("Accept", "application/octet-stream");
+            request.Headers.TryAdd("Accept", "application/octet-stream");
         }
     }
 }

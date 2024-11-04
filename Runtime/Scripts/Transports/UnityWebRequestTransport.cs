@@ -2,23 +2,20 @@
 using System.Collections;
 using KindMen.Uxios.Errors;
 using KindMen.Uxios.ExpectedTypesOfResponse;
-using KindMen.Uxios.Http;
-using Newtonsoft.Json;
 using RSG;
 using UnityEngine;
 using UnityEngine.Networking;
 using DataProcessingError = KindMen.Uxios.Errors.DataProcessingError;
-using QueryParameters = KindMen.Uxios.Http.QueryParameters;
 
-namespace KindMen.Uxios
+namespace KindMen.Uxios.Transports
 {
-    internal sealed class WebRequestRunner : MonoBehaviour, IRequestRunner
+    internal sealed class UnityWebRequestTransport : MonoBehaviour, IUxiosTransport
     {
-        private static WebRequestRunner webRequestRunner;
+        private static UnityWebRequestTransport unityWebRequestTransport;
 
-        public static WebRequestRunner Instance()
+        public static UnityWebRequestTransport Instance()
         {
-            if (webRequestRunner != null) return webRequestRunner;
+            if (unityWebRequestTransport != null) return unityWebRequestTransport;
 
             var gameObject = new GameObject
             {
@@ -26,9 +23,9 @@ namespace KindMen.Uxios
             };
             DontDestroyOnLoad(gameObject);
 
-            webRequestRunner = gameObject.AddComponent<WebRequestRunner>();
+            unityWebRequestTransport = gameObject.AddComponent<UnityWebRequestTransport>();
 
-            return webRequestRunner;
+            return unityWebRequestTransport;
         }
 
         public Promise<Response> PerformRequest<TData>(Config config) where TData : class
@@ -42,12 +39,12 @@ namespace KindMen.Uxios
             return promise;
         }
 
-        private UnityWebRequest ConvertToUnityWebRequest(Config config, byte[] bytes)
+        private UnityWebRequest ConvertToUnityWebRequest(Config config, Request uxiosRequest)
         {
             // Attach all params to the URL for UnityWebRequest
-            var url = new UriBuilder(config.Url) { Query = config.Params.ToString() }.Uri;
+            var url = new UriBuilder(uxiosRequest.Url) { Query = uxiosRequest.QueryString.ToString() }.Uri;
 
-            var webRequest = new UnityWebRequest(url, config.Method.ToString());
+            var webRequest = new UnityWebRequest(url, uxiosRequest.Method.ToString());
             webRequest.timeout = config.Timeout;
             webRequest.redirectLimit = config.MaxRedirects;
             webRequest.downloadHandler = config.TypeOfResponseType switch
@@ -55,9 +52,9 @@ namespace KindMen.Uxios
                 TextureResponse responseType => new DownloadHandlerTexture(responseType.Readable),
                 _ => new DownloadHandlerBuffer()
             };
-            webRequest.uploadHandler = new UploadHandlerRaw(bytes ?? new byte[]{});
+            webRequest.uploadHandler = new UploadHandlerRaw(uxiosRequest.Data ?? new byte[]{});
 
-            foreach (var header in config.Headers)
+            foreach (var header in uxiosRequest.Headers)
             {
                 webRequest.SetRequestHeader(header.Key, header.Value);
             }
@@ -71,39 +68,37 @@ namespace KindMen.Uxios
             // config if that is used
             config = config.Clone() as Config;
 
-            var request = ConvertToUnityWebRequest(
-                config, 
-                NormalizeConfigAndReturnByteArray<TData>(config)
-            );
+            var uxiosRequest = Request.FromConfig<TData>(config);
+            var unityWebRequest = ConvertToUnityWebRequest(config, uxiosRequest);
 
             foreach (var requestInterceptor in Uxios.Interceptors.request)
             {
                 config = requestInterceptor.success.Invoke(config);
             }
 
-            request.SendWebRequest();
-            while (!request.isDone) 
+            unityWebRequest.SendWebRequest();
+            while (!unityWebRequest.isDone) 
             {
                 if (config.CancelToken.IsCancellationRequested)
                 {
                     // Abort the request and continue in the loop, abort attempts to finish
                     // as soon as possible, but may not be immediate
-                    request.Abort();
+                    unityWebRequest.Abort();
                 }
 
                 yield return null;
             }
 
-            if (request.result is UnityWebRequest.Result.ConnectionError or UnityWebRequest.Result.DataProcessingError)
+            if (unityWebRequest.result is UnityWebRequest.Result.ConnectionError or UnityWebRequest.Result.DataProcessingError)
             {
-                RejectRequest(config, promise, request);
+                RejectRequest(config, promise, unityWebRequest);
                 yield break;
             }
 
             // If an exception occurs in the whole response interpretation chain, reject the promise
             try
             {
-                Response response = new UnityWebResponse(config, request);
+                Response response = new UnityWebResponse(config, uxiosRequest, unityWebRequest);
 
                 if (response.IsValid() == false)
                 {
@@ -149,58 +144,6 @@ namespace KindMen.Uxios
             }
 
             promise.Reject(error);
-        }
-
-        private byte[] NormalizeConfigAndReturnByteArray<TData>(Config config) where TData : class
-        {
-            // Make URI an absolute Uri for easy handling
-            var urlBuilder = new UriBuilder(!config.Url.IsAbsoluteUri ? new Uri(config.BaseUrl, config.Url) : config.Url);
-            // Move any query parameters from the URL to the Params collection ...
-            config.Params = new QueryParameters(QueryString.Merge(urlBuilder.Query.TrimStart('?'), config.Params.ToString()));
-            // ... meaning that the query part of the URI becomes empty
-            urlBuilder.Query = "";
-            // Overwrite URI
-            config.Url = urlBuilder.Uri;
-
-            config.TypeOfResponseType.AddResponseMetadataToConfig(config);
-            if (config.Auth is BasicAuthenticationCredentials credentials)
-            {
-                config.Headers.TryAdd("Authorization", credentials.ToAuthorizationToken());
-            }
-            
-            var (contentType, bytes) = ConvertToByteArray<TData>(config.Data);
-            if (string.IsNullOrEmpty(contentType) == false)
-            {
-                config.Headers.TryAdd("Content-Type", contentType);
-            }
-
-            return bytes;
-        }
-
-        private static (string contentType, byte[] bytes) ConvertToByteArray<T>(object data) where T : class
-        {
-            T dataToSend = data as T;
-            if (data == null)
-            {
-                return (null, null);
-            }
-            
-            switch (dataToSend)
-            {
-                case byte[] asByteArray:
-                    return ("application/octet-stream", bytes: asByteArray);
-                case string asString:
-                    return ("text/plain", bytes: System.Text.Encoding.UTF8.GetBytes(asString));
-                case object asObject:
-                {
-                    // TODO: make setting configurable
-                    var serializedString = JsonConvert.SerializeObject(asObject, typeof(T), null);
-
-                    return ("application/json", bytes: System.Text.Encoding.UTF8.GetBytes(serializedString));
-                }
-                default:
-                    throw new Exception("Unable to determine how to convert this into a byte array");
-            }
         }
     }
 }

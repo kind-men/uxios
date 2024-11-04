@@ -2,7 +2,7 @@
 
 namespace KindMen.Uxios
 {
-    public interface IRequestRunner
+    public interface IUxiosTransport
     {
         Promise<Response> PerformRequest<TData>(Config config) where TData : class;
     }

@@ -4,7 +4,6 @@ using RSG;
 
 namespace KindMen.Uxios.Api
 {
-    // TODO: Add tests whether Value contains a value or shoudl be refreshed
     // TODO: Add cache staleness checks?
     public class Resource<T> where T : class
     {

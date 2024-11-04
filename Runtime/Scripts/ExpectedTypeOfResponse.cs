@@ -5,7 +5,7 @@ namespace KindMen.Uxios
 {
     public abstract class ExpectedTypeOfResponse
     {
-        public abstract void AddResponseMetadataToConfig(Config config);
+        public abstract void AddMetadataToRequest(Request request);
         
         public static ExpectedTypeOfResponse Text()
         {

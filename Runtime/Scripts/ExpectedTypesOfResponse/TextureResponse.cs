@@ -4,9 +4,9 @@
     {
         public bool Readable = false;
 
-        public override void AddResponseMetadataToConfig(Config config)
+        public override void AddMetadataToRequest(Request request)
         {
-            config.Headers.TryAdd("Accept", "image/*");
+            request.Headers.TryAdd("Accept", "image/*");
         }
     }
 }

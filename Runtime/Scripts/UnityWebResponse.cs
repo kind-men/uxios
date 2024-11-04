@@ -10,7 +10,9 @@ namespace KindMen.Uxios
 {
     public sealed class UnityWebResponse : Response
     {
-        public UnityWebResponse(Config config, UnityWebRequest webRequest)
+        public UnityWebRequest UnityWebRequest;
+
+        public UnityWebResponse(Config config, Request uxiosRequest, UnityWebRequest webRequest)
         {
             // TODO apply transformation according to config.responseType and then config.Transforms
             Data = config.TypeOfResponseType switch
@@ -25,7 +27,8 @@ namespace KindMen.Uxios
             Config = config;
             Status = (HttpStatusCode)webRequest.responseCode;
             Headers = new Headers(webRequest.GetResponseHeaders());
-            Request = webRequest;
+            Request = uxiosRequest;
+            UnityWebRequest = webRequest;
         }
 
         private static Texture2D AsTexture(UnityWebRequest webRequest)

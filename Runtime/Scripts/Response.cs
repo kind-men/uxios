@@ -10,7 +10,7 @@ namespace KindMen.Uxios
         public HttpStatusCode Status;
         public Headers Headers;
         public Config Config;
-        public UnityWebRequest Request;
+        public Request Request;
 
         public bool IsValid()
         {

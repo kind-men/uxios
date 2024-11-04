@@ -4,9 +4,9 @@ namespace KindMen.Uxios.ExpectedTypesOfResponse
 {
     public sealed class TextResponse : ExpectedTypeOfResponse
     {
-        public override void AddResponseMetadataToConfig(Config config)
+        public override void AddMetadataToRequest(Request request)
         {
-            config.Headers.TryAdd("Accept", "text/*");
+            request.Headers.TryAdd("Accept", "text/*");
         }
     }
 }

@@ -15,9 +15,9 @@ namespace KindMen.Uxios.ExpectedTypesOfResponse
         /// </summary>
         public string OfResourceType = "application/json";
         
-        public override void AddResponseMetadataToConfig(Config config)
+        public override void AddMetadataToRequest(Request request)
         {
-            config.Headers.TryAdd("Accept", OfResourceType);
+            request.Headers.TryAdd("Accept", OfResourceType);
         }
     }
 }
