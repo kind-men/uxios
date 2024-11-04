@@ -47,22 +47,22 @@ namespace KindMen.Uxios
             // Attach all params to the URL for UnityWebRequest
             var url = new UriBuilder(config.Url) { Query = config.Params.ToString() }.Uri;
 
-            var wr = new UnityWebRequest(url, config.Method.ToString());
-            wr.timeout = config.Timeout;
-            wr.redirectLimit = config.MaxRedirects;
-            wr.downloadHandler = config.TypeOfResponseType switch
+            var webRequest = new UnityWebRequest(url, config.Method.ToString());
+            webRequest.timeout = config.Timeout;
+            webRequest.redirectLimit = config.MaxRedirects;
+            webRequest.downloadHandler = config.TypeOfResponseType switch
             {
                 TextureResponse responseType => new DownloadHandlerTexture(responseType.Readable),
                 _ => new DownloadHandlerBuffer()
             };
-            wr.uploadHandler = new UploadHandlerRaw(bytes ?? new byte[]{});
+            webRequest.uploadHandler = new UploadHandlerRaw(bytes ?? new byte[]{});
 
             foreach (var header in config.Headers)
             {
-                wr.SetRequestHeader(header.Key, header.Value);
+                webRequest.SetRequestHeader(header.Key, header.Value);
             }
 
-            return wr;
+            return webRequest;
         }
 
         private IEnumerator DoRequest<TData>(Config config, Promise<Response> promise) where TData : class
@@ -71,9 +71,10 @@ namespace KindMen.Uxios
             // config if that is used
             config = config.Clone() as Config;
 
-            var bytes = NormalizeConfigAndReturnByteArray<TData>(config);
-
-            var request = ConvertToUnityWebRequest(config, bytes);
+            var request = ConvertToUnityWebRequest(
+                config, 
+                NormalizeConfigAndReturnByteArray<TData>(config)
+            );
 
             foreach (var requestInterceptor in Uxios.Interceptors.request)
             {
@@ -95,18 +96,7 @@ namespace KindMen.Uxios
 
             if (request.result is UnityWebRequest.Result.ConnectionError or UnityWebRequest.Result.DataProcessingError)
             {
-                Error error = request.result switch
-                {
-                    UnityWebRequest.Result.DataProcessingError => new DataProcessingError(request.error, config, null),
-                    _ => new ConnectionError(request.error, config, null)
-                };
-
-                foreach (var requestInterceptor in Uxios.Interceptors.request)
-                {
-                    error = requestInterceptor.error.Invoke(error);
-                }
-
-                promise.Reject(error);
+                RejectRequest(config, promise, request);
                 yield break;
             }
 
@@ -117,19 +107,7 @@ namespace KindMen.Uxios
 
                 if (response.IsValid() == false)
                 {
-                    Error error = (int)response.Status switch
-                    {
-                        >= 400 and < 500 => new HttpClientError((string)response.Data, config, response),
-                        >= 500 and < 600 => new HttpServerError((string)response.Data, config, response),
-                        _ => new ProtocolError((string)response.Data, config, response)
-                    };
-
-                    foreach (var responseInterceptor in Uxios.Interceptors.response)
-                    {
-                        error = responseInterceptor.error.Invoke(error);
-                    }
-
-                    promise.Reject(error);
+                    RejectResponse(promise, response);
                     yield break;
                 }
 
@@ -142,14 +120,35 @@ namespace KindMen.Uxios
             }
             catch (Exception e)
             {
-                var error = new Error(e.Message, config, null);
-                foreach (var responseInterceptor in Uxios.Interceptors.response)
-                {
-                    error = responseInterceptor.error.Invoke(error);
-                }
-
-                promise.Reject(error);
+                RejectWithError(promise, new Error(e.Message, config, null));
             }
+        }
+
+        private static void RejectRequest(Config config, Promise<Response> promise, UnityWebRequest request)
+        {
+            RejectWithError(
+                promise, 
+                request.result switch
+                {
+                    UnityWebRequest.Result.DataProcessingError => new DataProcessingError(request.error, config, null),
+                    _ => new ConnectionError(request.error, config, null)
+                }
+            );
+        }
+
+        private static void RejectResponse(Promise<Response> promise, Response response)
+        {
+            RejectWithError(promise, ErrorFactory.Create(response));
+        }
+
+        private static void RejectWithError(Promise<Response> promise, Error error)
+        {
+            foreach (var responseInterceptor in Uxios.Interceptors.response)
+            {
+                error = responseInterceptor.error.Invoke(error);
+            }
+
+            promise.Reject(error);
         }
 
         private byte[] NormalizeConfigAndReturnByteArray<TData>(Config config) where TData : class
@@ -178,7 +177,7 @@ namespace KindMen.Uxios
             return bytes;
         }
 
-        private (string contentType, byte[] bytes) ConvertToByteArray<T>(object data) where T : class
+        private static (string contentType, byte[] bytes) ConvertToByteArray<T>(object data) where T : class
         {
             T dataToSend = data as T;
             if (data == null)
@@ -186,25 +185,22 @@ namespace KindMen.Uxios
                 return (null, null);
             }
             
-            if (dataToSend is byte[] asByteArray)
+            switch (dataToSend)
             {
-                return ("application/octet-stream", bytes: asByteArray);
-            } 
-            
-            if (dataToSend is string asString)
-            {
-                return ("text/plain", bytes: System.Text.Encoding.UTF8.GetBytes(asString));
-            }
-            
-            if (dataToSend is object asObject)
-            {
-                // TODO: make setting configurable
-                var serializedString = JsonConvert.SerializeObject(asObject, typeof(T), null);
-                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(serializedString);
-                return ("application/json", bytes);
-            }
+                case byte[] asByteArray:
+                    return ("application/octet-stream", bytes: asByteArray);
+                case string asString:
+                    return ("text/plain", bytes: System.Text.Encoding.UTF8.GetBytes(asString));
+                case object asObject:
+                {
+                    // TODO: make setting configurable
+                    var serializedString = JsonConvert.SerializeObject(asObject, typeof(T), null);
 
-            throw new Exception("Unable to determine how to convert this into a byte array");
+                    return ("application/json", bytes: System.Text.Encoding.UTF8.GetBytes(serializedString));
+                }
+                default:
+                    throw new Exception("Unable to determine how to convert this into a byte array");
+            }
         }
     }
 }

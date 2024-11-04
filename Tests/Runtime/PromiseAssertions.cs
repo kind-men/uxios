@@ -16,12 +16,7 @@ namespace KindMen.Uxios.Tests
             );
         }
 
-        public static IEnumerator AssertPromiseSucceeds(Promise<Response> promise, Action<Response> onSuccess)
-        {
-            return AssertPromiseSucceeds(promise, onSuccess);
-        }
-
-        public static IEnumerator AssertPromiseErrorsWithMessage(Promise<Response> promise, string startsWith)
+        public static IEnumerator AssertPromiseErrorsWithMessage<TResponse>(Promise<TResponse> promise, string startsWith)
         {
             return AssertPromiseErrors(
                 promise,
@@ -29,14 +24,14 @@ namespace KindMen.Uxios.Tests
             );
         }
 
-        public static IEnumerator AssertPromiseErrors(Promise<Response> promise, Action<Exception> onError)
+        public static IEnumerator AssertPromiseErrors<TResponse>(Promise<TResponse> promise, Action<Exception> onError)
         {
             return AssertPromise(promise, UnexpectedSuccess, onError);
         }
 
-        private static void UnexpectedSuccess(Response response)
+        private static void UnexpectedSuccess<TResponse>(TResponse response)
         {
-            Assert.Fail("It was not expected for this to succeed, received: " + response?.Data);
+            Assert.Fail("It was not expected for this to succeed, received: " + response);
         }
 
         private static IEnumerator AssertPromise<TResponse>(

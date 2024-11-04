@@ -6,8 +6,6 @@ namespace KindMen.Uxios.Api
 {
     // TODO: Add tests whether Value contains a value or shoudl be refreshed
     // TODO: Add cache staleness checks?
-    // TODO: Do not instantiate Uxios here, should we use a global version? Perhaps a specific static factory for 
-    // these objects?
     public class Resource<T> where T : class
     {
         private readonly Uri iri;
@@ -25,13 +23,13 @@ namespace KindMen.Uxios.Api
             get
             {
                 return (Promise<bool>)this.uxios.Head(iri)
-                    .Then(response => true)
+                    .Then(_ => true)
                     .Catch(error =>
                     {
                         // Resource does not exist if NotFoundError is thrown
                         if (error is NotFoundError) return false;
-                        // TODO: Will the above and below work? 
-                        throw error; // Re-throw any other exceptions
+
+                        throw error;
                     });
             }
         }

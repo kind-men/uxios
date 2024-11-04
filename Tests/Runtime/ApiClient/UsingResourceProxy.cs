@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Net;
 using KindMen.Uxios.Api;
 using NUnit.Framework;
 using UnityEngine.TestTools;
@@ -23,12 +24,39 @@ namespace KindMen.Uxios.Tests.ApiClient
 
             var resource = new Resource<ExamplePost>(url);
 
+            yield return PromiseAssertions.AssertPromiseSucceeds(resource.Value, AssertCanonicalPost);
+        }
+
+        [UnityTest]
+        public IEnumerator CheckIfAValueExists()
+        {
+            var resource = new Resource<ExamplePost>(new Uri("https://jsonplaceholder.typicode.com/posts/1"));
+
             yield return PromiseAssertions.AssertPromiseSucceeds(
-                resource.Value, 
-                post =>
-                {
-                    AssertCanonicalPost(post as ExamplePost);
-                }
+                resource.HasValue, 
+                exists => Assert.That(exists, Is.True)
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator CheckIfAValueDoesNotExists()
+        {
+            var resource = new Resource<ExamplePost>(new Uri("https://httpbin.org/status/404"));
+
+            yield return PromiseAssertions.AssertPromiseSucceeds(
+                resource.HasValue, 
+                exists => Assert.That(exists, Is.False)
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator ErrorWhenCheckingForAValuesExistenceThrowsAnUnexpectedError()
+        {
+            var resource = new Resource<ExamplePost>(new Uri("https://httpbin.org/status/500"));
+
+            yield return PromiseAssertions.AssertPromiseErrors(
+                resource.HasValue, 
+                e => Assert.That((e as Error)!.Response.Status, Is.EqualTo(HttpStatusCode.InternalServerError))
             );
         }
 
