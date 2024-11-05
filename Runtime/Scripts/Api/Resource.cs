@@ -21,7 +21,7 @@ namespace KindMen.Uxios.Api
         {
             get
             {
-                return (Promise<bool>)this.uxios.Head(iri)
+                return this.uxios.Head(iri)
                     .Then(_ => true)
                     .Catch(error =>
                     {
@@ -29,7 +29,7 @@ namespace KindMen.Uxios.Api
                         if (error is NotFoundError) return false;
 
                         throw error;
-                    });
+                    }) as Promise<bool>;
             }
         }
 
@@ -40,39 +40,39 @@ namespace KindMen.Uxios.Api
                 // Transparently return the cached value; no need to refresh it unless it goes stale
                 if (_cachedValue != null)
                 {
-                    return (Promise<T>)new Promise<T>().Then(arg => _cachedValue);
+                    return Promise<T>.Resolved(_cachedValue) as Promise<T>;
                 }
 
-                return (Promise<T>)FetchResourceAsync().Then(arg => _cachedValue = arg);
+                return FetchResourceAsync().Then(arg => _cachedValue = arg) as Promise<T>;
             }
         }
 
         // Set or update the resource with new data
         public Promise<T> Update(T updatedValue)
         {
-            return (Promise<T>)UpdateResourceAsync(updatedValue).Then(arg => _cachedValue = updatedValue);
+            return UpdateResourceAsync(updatedValue).Then(arg => _cachedValue = updatedValue) as Promise<T>;
         }
 
         public Promise RemoveAsync()
         {
-            return (Promise)DeleteResourceAsync().Then(() => _cachedValue = default);
+            return DeleteResourceAsync();
         }
 
         private Promise<T> FetchResourceAsync()
         {
-            return (Promise<T>)this.uxios.Get<T>(iri)
-                .Then(response => response.Data as T);
+            return uxios.Get<T>(iri)
+                .Then(response => response.Data as T) as Promise<T>;
         }
 
         private Promise<T> UpdateResourceAsync(T updatedResource)
         {
-            return (Promise<T>)this.uxios.Put<T, T>(iri, updatedResource)
-                .Then(response => response.Data as T);
+            return uxios.Put<T, T>(iri, updatedResource)
+                .Then(response => response.Data as T) as Promise<T>;
         }
 
         private Promise DeleteResourceAsync()
         {
-            return (Promise)this.uxios.Delete(iri).Then(response => { _cachedValue = default; });
+            return uxios.Delete(iri).Then(_ => { _cachedValue = default; }) as Promise;
         }        
     }
 }

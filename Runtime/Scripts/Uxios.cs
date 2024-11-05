@@ -226,5 +226,15 @@ namespace KindMen.Uxios
         {
             return new WaitUntil(() => request.CurState != PromiseState.Pending);
         }
+
+        public static CustomYieldInstruction WaitForRequest(IPromise request)
+        {
+            return new WaitUntil(() => ((Promise)request).CurState != PromiseState.Pending);
+        }
+        
+        public static TData GrabData<TData>(Response response)
+        {
+            return (TData)response.Data;
+        }
     }
 }

@@ -1,8 +1,9 @@
 nav:
   - 'index.md'
-#  - 'Guides':
-#      - 'guides/quickstart.md'
-#  - 'Explanation':
+  - 'Guides':
+      - 'guides/fetching-pokemon.md' 
+  - 'Explanation':
+      - 'explanation/promises.md'
 #    - 'Overview': 'docs/explanation/core-concepts.md'
 #  - 'Reference':
 #      - 'reference/index.md'
