@@ -28,7 +28,7 @@ Use the `HasValue` property of `Resource` to perform a HEAD request and check if
 !!! info "New to promises?"
 
     If you haven't worked with promises before, we have written an explanation on what promises are in contrast to 
-    Coroutines, [which you can find here](../../explanation/promises).
+    Coroutines, [which you can find here](../explanation/promises.md).
 
 **Example: Checking if the Resource Exists**
 

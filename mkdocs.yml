@@ -1,7 +1,10 @@
 nav:
-  - 'index.md'
+  - 'About Uxios':
+    - 'index.md'
+    - 'getting-started.md'
   - 'Guides':
       - 'guides/fetching-pokemon.md' 
+      - 'guides/fetching-untyped-json-responses.md' 
   - 'Explanation':
       - 'explanation/promises.md'
 #    - 'Overview': 'docs/explanation/core-concepts.md'

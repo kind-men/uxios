@@ -53,7 +53,7 @@ namespace KindMen.Uxios.Api
             return UpdateResourceAsync(updatedValue).Then(arg => _cachedValue = updatedValue) as Promise<T>;
         }
 
-        public Promise RemoveAsync()
+        public Promise Remove()
         {
             return DeleteResourceAsync();
         }
