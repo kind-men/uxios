@@ -19,6 +19,7 @@ not_in_nav: |
 
 site_name: "Uxios"
 docs_dir: "Documentation~"
+site_description: "A Unity-native, Axios-inspired HTTP client for streamlined, typed, and extensible networking across platforms."
 theme:
   name: material
   logo: images/logo.png
