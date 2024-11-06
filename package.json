@@ -4,7 +4,7 @@
   "displayName": "Uxios",
   "description": "A Unity-native, Axios-inspired HTTP client for streamlined, typed, and extensible networking across platforms.",
   "unity": "2022.3",
-  "documentationUrl": "https://github.com/kind-men/uxios/blob/main/README.md",
+  "documentationUrl": "https://kind-men.github.io/uxios/",
   "changelogUrl": "https://github.com/kind-men/uxios/blob/main/CHANGELOG.md",
   "licensesUrl": "https://github.com/kind-men/uxios/blob/main/LICENSE",
   "keywords": ["httpclient", "axios", "kindmen", "unitypackage", "junison"],
