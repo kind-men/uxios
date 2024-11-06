@@ -17,6 +17,16 @@ namespace KindMen.Uxios.Api
             this.uxios = Uxios.DefaultInstance;
         }
 
+        public static Resource<T> At(Uri url)
+        {
+            return new Resource<T>(url);
+        }
+
+        public static Resource<T> At(string url)
+        {
+            return new Resource<T>(new Uri(url));
+        }
+
         public Promise<bool> HasValue
         {
             get

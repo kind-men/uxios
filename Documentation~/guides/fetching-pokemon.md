@@ -5,19 +5,19 @@ it to retrieve data for a specific Pokémon by its ID or name.
 
 ## Step 1: Create a Resource for a Pokémon
 
-First, let's set up a `Resource` instance for a specific Pokémon, such as Pikachu. We’ll use a `System.Uri` to define 
-the Pokémon’s URL, and we’ll define a `Pokemon` class to represent the Pokémon data model.
+First, let's set up a `Resource` instance for a specific Pokémon, such as Pikachu. We’ll use a string to define 
+the Pokémon’s URL -though `System.Uri` is supported as well-, and we’ll define a `Pokemon` class to represent the 
+Pokémon data model.
 
 **Example: Setting up the Resource**
 
 ```csharp
-using System;
 using KindMen.Uxios.Api;
 
-Uri url = new Uri("https://pokeapi.co/api/v2/pokemon/pikachu");
+string url = "https://pokeapi.co/api/v2/pokemon/pikachu";
 
 // Create a Resource for Pikachu by URL
-var pikachu = new Resource<Pokemon>(url);
+var pikachu = Resource<Pokemon>.At(url);
 ```
 
 ## Step 2: Check if the Pokémon Resource Exists
