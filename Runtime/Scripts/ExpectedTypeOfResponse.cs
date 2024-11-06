@@ -22,6 +22,11 @@ namespace KindMen.Uxios
             return new TextureResponse { Readable = readOnly };
         }
 
+        public static ExpectedTypeOfResponse Sprite(bool readOnly = false)
+        {
+            return new SpriteResponse { Readable = readOnly };
+        }
+
         public static ExpectedTypeOfResponse Json(Type deserializeAs = null)
         {
             return new JsonResponse { DeserializeAs = deserializeAs };

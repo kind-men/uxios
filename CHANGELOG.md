@@ -13,3 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support for downloading Texture2D's directly from online images
 - Support for GETting byte arrays
 - The Axios API was modelled and filled in for the most part
+- A "Resource" class was introduced to provide a convenient API for Unity users who are not used to Web lingo
+- QueryString handling is provided by a port from querystring.js - Unity WebGL does not have access to native C# functionality
+- Error handling is gradually being fine-tuned to provide specific error classes when an exception happens
+- Interceptors have been implemented and will now allow inspection and manipulation of the Config and Response
+- Basic Authentication support is provided
+- A TemplatedUri wrapper is introduced as a beta functionality

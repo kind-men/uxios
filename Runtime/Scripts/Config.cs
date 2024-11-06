@@ -23,7 +23,7 @@ namespace KindMen.Uxios
         public Headers Headers = new();
         public QueryParameters Params = new();
         public object Data;
-        public int Timeout = 30;
+        public int Timeout = 30; // TODO: Convert to milliseconds and fix this in Transport
         public Credentials Auth;
         
         public ExpectedTypeOfResponse TypeOfResponseType = null;

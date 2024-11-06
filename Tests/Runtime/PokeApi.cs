@@ -74,6 +74,8 @@ namespace KindMen.Uxios.Tests
 
             // because this is a test .. we need to make this blocking. Boo!
             yield return Uxios.WaitForRequest(promise);
+            
+            // dit is na de promise
         }
     }
 }

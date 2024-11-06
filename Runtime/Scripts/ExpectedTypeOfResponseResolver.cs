@@ -16,6 +16,7 @@ namespace KindMen.Uxios
         public ExpectedTypeOfResponse Resolve<T>(Config config)
         {
             if (typeof(T) == typeof(Texture2D)) return ExpectedTypeOfResponse.Texture();
+            if (typeof(T) == typeof(Sprite)) return ExpectedTypeOfResponse.Sprite();
             if (typeof(T) == typeof(string)) return ExpectedTypeOfResponse.Text();
             if (typeof(T) == typeof(JObject)) return ExpectedTypeOfResponse.Json();
             if (typeof(T) == typeof(byte[])) return ExpectedTypeOfResponse.ArrayBuffer();

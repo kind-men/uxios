@@ -21,6 +21,7 @@ namespace KindMen.Uxios
                 TextResponse _ => webRequest.downloadHandler.text,
                 ArrayBufferResponse _ => webRequest.downloadHandler.data,
                 TextureResponse _ => AsTexture(webRequest),
+                SpriteResponse _ => AsSprite(webRequest),
                 _ => webRequest.downloadHandler.data
             };
 
@@ -43,6 +44,22 @@ namespace KindMen.Uxios
             }
             
             return webRequestDownloadHandler.texture;
+        }
+
+        private static Sprite AsSprite(UnityWebRequest webRequest)
+        {
+            if (webRequest.downloadHandler is not DownloadHandlerTexture webRequestDownloadHandler)
+            {
+                var unexpectedType = webRequest.downloadHandler.GetType();
+                throw new InvalidCastException(
+                    $"The Sprite response expects a DownloadHandlerTexture object as DownloadHandler, but an " 
+                    + $"instance of {unexpectedType} was received"
+                );
+            }
+            
+            Texture2D texture = webRequestDownloadHandler.texture;
+
+            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
         }
 
         private static object AsJsonObject(UnityWebRequest webRequest, JsonResponse expectedResponse)
