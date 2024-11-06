@@ -7,9 +7,10 @@
   "documentationUrl": "https://github.com/kind-men/uxios/blob/main/README.md",
   "changelogUrl": "https://github.com/kind-men/uxios/blob/main/CHANGELOG.md",
   "licensesUrl": "https://github.com/kind-men/uxios/blob/main/LICENSE",
-  "keywords": [],
+  "keywords": ["httpclient", "axios", "kindmen", "unitypackage", "junison"],
   "author": {
     "name": "Mike van Riel",
+    "email": "mike@kind-men.com",
     "url": "https://www.kind-men.com"
   },
   "scripts": {
