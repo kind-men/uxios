@@ -5,6 +5,7 @@ nav:
   - 'Guides':
       - 'guides/fetching-pokemon.md' 
       - 'guides/fetching-untyped-json-responses.md' 
+      - 'guides/building-an-automatic-loader.md' 
   - 'Explanation':
       - 'explanation/promises.md'
 #    - 'Overview': 'docs/explanation/core-concepts.md'
