@@ -21,5 +21,12 @@
     "com.unity.modules.unitywebrequest": "1.0.0",
     "com.unity.nuget.newtonsoft-json": "3.2.0",
     "com.rsg.promise": "3.0.1"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "Pokemon",
+      "description": "Basic example that demonstrates how to retrieve and show information from the PokeApi",
+      "path": "Samples~/Pokemon"
+    }
+  ]
 }

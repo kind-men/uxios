@@ -50,6 +50,7 @@ namespace KindMen.Uxios.Transports
             webRequest.downloadHandler = config.TypeOfResponseType switch
             {
                 TextureResponse responseType => new DownloadHandlerTexture(responseType.Readable),
+                SpriteResponse responseType => new DownloadHandlerTexture(responseType.Readable),
                 _ => new DownloadHandlerBuffer()
             };
             webRequest.uploadHandler = new UploadHandlerRaw(uxiosRequest.Data ?? new byte[]{});
