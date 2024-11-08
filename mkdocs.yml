@@ -1,8 +1,11 @@
 nav:
   - 'About Uxios':
     - 'index.md'
-    - 'getting-started.md'
+    - 'features.md'
+    - 'why-use-uxios-instead-of-unitywebrequest.md'
+    - 'why-axios.md'
   - 'Documentation':
+    - 'getting-started.md'
     - 'Guides':
         - 'guides/fetching-pokemon.md' 
         - 'guides/fetching-pokemon-using-get.md' 
