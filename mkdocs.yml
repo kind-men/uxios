@@ -2,23 +2,22 @@ nav:
   - 'About Uxios':
     - 'index.md'
     - 'getting-started.md'
-  - 'Guides':
-      - 'guides/fetching-pokemon.md' 
-      - 'guides/fetching-untyped-json-responses.md' 
-      - 'guides/building-an-automatic-loader.md' 
-  - 'Explanation':
-      - 'explanation/promises.md'
-#    - 'Overview': 'docs/explanation/core-concepts.md'
-#  - 'Reference':
-#      - 'reference/index.md'
-#  - 'Contributing':
-#      - '../CONTRIBUTING.md'
+  - 'Documentation':
+    - 'Guides':
+        - 'guides/fetching-pokemon.md' 
+        - 'guides/fetching-pokemon-using-get.md' 
+        - 'guides/fetching-untyped-json-responses.md' 
+        - 'guides/building-an-automatic-loader.md' 
+    - 'Explanation':
+        - 'explanation/promises.md'
+    - 'Reference':
+        - 'reference/response.md'
 
 # Includes, starting with an underscore - https://www.mkdocs.org/user-guide/configuration/#not_in_nav
 not_in_nav: |
   _*.md
 
-site_name: "Uxios"
+site_name: ""
 docs_dir: "Documentation~"
 site_description: "A Unity-native, Axios-inspired HTTP client for streamlined, typed, and extensible networking across platforms."
 theme:
@@ -42,7 +41,6 @@ theme:
         name: Switch to light mode
   features:
     - navigation.indexes
-    - navigation.sections
     - navigation.tabs
     - navigation.instant
     - navigation.path
