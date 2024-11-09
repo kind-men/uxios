@@ -14,6 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added a new Sample to demonstrate basic usage to tie Uxios onto a UI
+- Support for authenticating with Bearer tokens when you instantiate BearerTokenCredentials and assign that 
+  to Config.Auth
+
+### Changed
+
+- Timeout value is now in milliseconds - this value was in seconds and did not match how Axios works, or frequent
+  uses of timeout.
 
 ## [0.1.0] - 2024-11-06
 
