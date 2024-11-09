@@ -45,7 +45,10 @@ namespace KindMen.Uxios.Transports
             var url = new UriBuilder(uxiosRequest.Url) { Query = uxiosRequest.QueryString.ToString() }.Uri;
 
             var webRequest = new UnityWebRequest(url, uxiosRequest.Method.ToString());
-            webRequest.timeout = config.Timeout;
+            // Unity's timeout is in whole seconds only, so we divide by 1000 (multiplication is done as a performance
+            // improvement) and round up (ceil) to prevent a value of -for example- 300ms accidentally becoming 0 and
+            // thus: no timeout
+            webRequest.timeout = Mathf.CeilToInt(config.Timeout * 0.001f);
             webRequest.redirectLimit = config.MaxRedirects;
             webRequest.downloadHandler = config.TypeOfResponseType switch
             {

@@ -152,8 +152,8 @@ namespace KindMen.Uxios.Tests.HttpClient
         {
             var url = new Uri("https://httpbin.org/delay/3");
 
-            // Time-out set to 1 while the delay above is 3, this should trigger a timeout
-            Config config = new Config() { Timeout = 1 };
+            // Time-out set to 1s while the delay above is 3s, this should trigger a timeout
+            Config config = new Config() { Timeout = 1000 };
             var promise = uxios.Get<string>(url, config);
 
             yield return PromiseAssertions.AssertPromiseErrors(

@@ -23,7 +23,14 @@ namespace KindMen.Uxios
         public Headers Headers = new();
         public QueryParameters Params = new();
         public object Data;
-        public int Timeout = 30; // TODO: Convert to milliseconds and fix this in Transport
+        
+        /// <summary>
+        /// The number of milliseconds after which a request will timeout, default is 0; meaning it will not timeout.
+        ///
+        /// Some transports, such as UnityWebRequest, do not support fractions of seconds. It is assumed that transports
+        /// will round up to prevent accidentally setting the value to 0 - and thus no timeout.
+        /// </summary>
+        public int Timeout = 0;
         public Credentials Auth;
         
         public ExpectedTypeOfResponse TypeOfResponseType = null;
