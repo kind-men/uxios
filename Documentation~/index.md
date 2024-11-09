@@ -1,4 +1,5 @@
-﻿# About Uxios
+﻿<h1 class="hidden">Uxios</h1>
+![logo.png](images/logo.png)
 
 Uxios is a Unity C# library inspired by [Axios](https://axios-http.com/), the popular JavaScript HTTP client. Designed
 for use with Unity, Uxios provides an intuitive and consistent API for making HTTP requests, mirroring the ease of use

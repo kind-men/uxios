@@ -1,9 +1,11 @@
 nav:
   - 'About Uxios':
-    - 'index.md'
-    - 'features.md'
+    - "About Uxios": 'index.md'
     - 'why-use-uxios-instead-of-unitywebrequest.md'
+    - 'features.md'
     - 'why-axios.md'
+    - 'contributing.md'
+    - 'changelog.md'
   - 'Documentation':
     - 'getting-started.md'
     - 'Guides':
@@ -24,6 +26,8 @@ not_in_nav: |
 site_name: ""
 docs_dir: "Documentation~"
 site_description: "A Unity-native, Axios-inspired HTTP client for streamlined, typed, and extensible networking across platforms."
+extra_css:
+  - "css/utilities.css"
 theme:
   name: material
   logo: images/logo.png
