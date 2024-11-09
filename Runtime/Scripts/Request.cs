@@ -73,7 +73,7 @@ namespace KindMen.Uxios
             request.Method = config.Method;
 
             request.Headers = new Headers(config.Headers);
-            if (config.Auth is BasicAuthenticationCredentials credentials)
+            if (config.Auth is ICredentialsUsingAuthorizationToken credentials)
             {
                 request.Headers.TryAdd("Authorization", credentials.ToAuthorizationToken());
             }
