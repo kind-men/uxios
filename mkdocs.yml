@@ -1,8 +1,8 @@
 nav:
   - 'About Uxios':
     - "About Uxios": 'index.md'
-    - 'why-use-uxios-instead-of-unitywebrequest.md'
     - 'features.md'
+    - 'why-use-uxios-instead-of-unitywebrequest.md'
     - 'why-axios.md'
     - 'contributing.md'
     - 'changelog.md'
