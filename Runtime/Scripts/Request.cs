@@ -71,13 +71,18 @@ namespace KindMen.Uxios
             urlBuilder.Query = "";
             request.Url = urlBuilder.Uri;
             request.Method = config.Method;
-
             request.Headers = new Headers(config.Headers);
-            if (config.Auth is ICredentialsUsingAuthorizationToken credentials)
+
+            switch (config.Auth)
             {
-                request.Headers.TryAdd("Authorization", credentials.ToAuthorizationToken());
+                case ICredentialsUsingAuthorizationToken credentials:
+                    request.Headers.TryAdd("Authorization", credentials.ToAuthorizationToken());
+                    break;
+                case ICredentialsUsingQueryString queryStringCredentials:
+                    request.QueryString.Add(queryStringCredentials.ToQueryStringSegments());
+                    break;
             }
-            
+
             config.TypeOfResponseType.AddMetadataToRequest(request);
             var (contentType, bytes) = ConvertToByteArray<TData>(config.Data);
             if (string.IsNullOrEmpty(contentType) == false)

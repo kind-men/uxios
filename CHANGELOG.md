@@ -9,19 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- ConsoleLogger middleware that will dispatch any request and response to the Debug.Log - for now internally used to 
+- `ConsoleLogger` middleware that will dispatch any request and response to the Debug.Log - for now internally used to 
   verify the concept, but intended for adding a Network Inspection tool similar to chrome
+- Support for adding credentials to the query string by instantiating a `QueryParameterCredentials` object and passing it
+  to the `Auth` field of a `Config` object
 
 ### Fixed
 
-- RequestInterceptor was called after Request had been created - but must be before so that the interceptors can change
-  the Config object, and thus influencing Request creation.
+- `RequestInterceptor` was called after `Request` had been created - but must be before so that the interceptors can 
+  change the `Config` object, and thus influencing `Request` creation.
 
 ### Changed
 
-- Refactored UnityWebRequestTransport to have common actions between all transports to be in TransportActions
-- Introduced new InMemoryTransport for testing purposes
-- Moved specialized Response classes for transports into Transport namespace and folder
+- Refactored `UnityWebRequestTransport` to have common actions between all transports to be in `TransportActions`
+- Introduced new `InMemoryTransport` for testing purposes
+- Moved specialized `Response` classes for transports into `Transport` namespace and folder
 
 ## [0.1.1] - 2024-11-09
 
