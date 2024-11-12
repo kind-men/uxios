@@ -10,14 +10,6 @@ namespace KindMen.Uxios.Tests.SpecificInterceptors
     {
         private Uxios uxios;
 
-        private class ExamplePost
-        {
-            public int userId;
-            public int id;
-            public string title;
-            public string body;
-        }
-
         [SetUp]
         public void SetUp()
         {
@@ -25,10 +17,10 @@ namespace KindMen.Uxios.Tests.SpecificInterceptors
         }
 
         [UnityTest]
-        public IEnumerator GetsWebpageAsString()
+        public IEnumerator LogsGettingAWebpage()
         {
-            // Auto-registers a series of interceptors (not sure whether this is the right solution yet)
-            var logger = new Logger();
+            // Auto-registers a series of interceptors, and deregisters once disposed
+            using var logger = new ConsoleLogger();
             
             var url = new Uri("https://httpbin.org/html");
             var config = new Config { TypeOfResponseType = ExpectedTypeOfResponse.Text() };
@@ -43,7 +35,8 @@ namespace KindMen.Uxios.Tests.SpecificInterceptors
 
         private void AssertExampleHtmlWasReceived(Response obj)
         {
-            
+            // TODO: Test whether the logger's calls were actually received - now we mainly test that the interceptors
+            //  don't break the application
         }
     }
 }
