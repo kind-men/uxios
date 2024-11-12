@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace KindMen.Uxios
+namespace KindMen.Uxios.Transports
 {
     public sealed class UnityWebResponse : Response
     {

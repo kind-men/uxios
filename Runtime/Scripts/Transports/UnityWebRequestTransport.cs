@@ -39,6 +39,50 @@ namespace KindMen.Uxios.Transports
             return promise;
         }
 
+        private IEnumerator DoRequest<TData>(Config config, Promise<Response> promise) where TData : class
+        {
+            var uxiosRequest = TransportActions.CreateRequest<TData>(ref config);
+            var unityWebRequest = ConvertToUnityWebRequest(config, uxiosRequest);
+            
+            unityWebRequest.SendWebRequest();
+            while (!unityWebRequest.isDone) 
+            {
+                if (config.CancelToken.IsCancellationRequested)
+                {
+                    // Abort the request and continue in the loop, abort attempts to finish
+                    // as soon as possible, but may not be immediate
+                    unityWebRequest.Abort();
+                }
+
+                yield return null;
+            }
+
+            if (unityWebRequest.result is UnityWebRequest.Result.ConnectionError or UnityWebRequest.Result.DataProcessingError)
+            {
+                RejectDuringRequest(config, promise, unityWebRequest);
+                yield break;
+            }
+
+            TransportActions.HandleResponse(
+                promise, 
+                config, 
+                uxiosRequest, 
+                (config, request) => new UnityWebResponse(config, request, unityWebRequest)
+            );
+        }
+
+        private void RejectDuringRequest(Config config, Promise<Response> promise, UnityWebRequest request)
+        {
+            TransportActions.RejectWithErrorDuringRequest(
+                promise, 
+                request.result switch
+                {
+                    UnityWebRequest.Result.DataProcessingError => new DataProcessingError(request.error, config, null),
+                    _ => new ConnectionError(request.error, config, null)
+                }
+            );
+        }
+
         private UnityWebRequest ConvertToUnityWebRequest(Config config, Request uxiosRequest)
         {
             // Attach all params to the URL for UnityWebRequest
@@ -64,90 +108,6 @@ namespace KindMen.Uxios.Transports
             }
 
             return webRequest;
-        }
-
-        private IEnumerator DoRequest<TData>(Config config, Promise<Response> promise) where TData : class
-        {
-            // Clone config so that any changes we do - do not affect the caller; as this may mess with the global
-            // config if that is used
-            config = config.Clone() as Config;
-
-            var uxiosRequest = Request.FromConfig<TData>(config);
-            var unityWebRequest = ConvertToUnityWebRequest(config, uxiosRequest);
-
-            foreach (var requestInterceptor in Uxios.Interceptors.request)
-            {
-                config = requestInterceptor.success.Invoke(config);
-            }
-
-            unityWebRequest.SendWebRequest();
-            while (!unityWebRequest.isDone) 
-            {
-                if (config.CancelToken.IsCancellationRequested)
-                {
-                    // Abort the request and continue in the loop, abort attempts to finish
-                    // as soon as possible, but may not be immediate
-                    unityWebRequest.Abort();
-                }
-
-                yield return null;
-            }
-
-            if (unityWebRequest.result is UnityWebRequest.Result.ConnectionError or UnityWebRequest.Result.DataProcessingError)
-            {
-                RejectRequest(config, promise, unityWebRequest);
-                yield break;
-            }
-
-            // If an exception occurs in the whole response interpretation chain, reject the promise
-            try
-            {
-                Response response = new UnityWebResponse(config, uxiosRequest, unityWebRequest);
-
-                if (response.IsValid() == false)
-                {
-                    RejectResponse(promise, response);
-                    yield break;
-                }
-
-                foreach (var responseInterceptor in Uxios.Interceptors.response)
-                {
-                    response = responseInterceptor.success.Invoke(response);
-                }
-                
-                promise.Resolve(response);
-            }
-            catch (Exception e)
-            {
-                RejectWithError(promise, new Error(e.Message, config, null));
-            }
-        }
-
-        private static void RejectRequest(Config config, Promise<Response> promise, UnityWebRequest request)
-        {
-            RejectWithError(
-                promise, 
-                request.result switch
-                {
-                    UnityWebRequest.Result.DataProcessingError => new DataProcessingError(request.error, config, null),
-                    _ => new ConnectionError(request.error, config, null)
-                }
-            );
-        }
-
-        private static void RejectResponse(Promise<Response> promise, Response response)
-        {
-            RejectWithError(promise, ErrorFactory.Create(response));
-        }
-
-        private static void RejectWithError(Promise<Response> promise, Error error)
-        {
-            foreach (var responseInterceptor in Uxios.Interceptors.response)
-            {
-                error = responseInterceptor.error.Invoke(error);
-            }
-
-            promise.Reject(error);
         }
     }
 }

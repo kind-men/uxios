@@ -5,6 +5,19 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- RequestInterceptor was called after Request had been created - but must be before so that the interceptors can change
+  the Config object, and thus influencing Request creation.
+
+### Changed
+
+- Refactored UnityWebRequestTransport to have common actions between all transports to be in TransportActions
+- Introduced new InMemoryTransport for testing purposes
+- Moved specialized Response classes for transports into Transport namespace and folder
+
 ## [0.1.1] - 2024-11-09
 
 ### Fixed
