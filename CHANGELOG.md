@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- ConsoleLogger middleware that will dispatch any request and response to the Debug.Log - for now internally used to 
+  verify the concept, but intended for adding a Network Inspection tool similar to chrome
+
 ### Fixed
 
 - RequestInterceptor was called after Request had been created - but must be before so that the interceptors can change
