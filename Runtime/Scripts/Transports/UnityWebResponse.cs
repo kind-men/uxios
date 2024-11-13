@@ -10,7 +10,7 @@ namespace KindMen.Uxios.Transports
 {
     public sealed class UnityWebResponse : Response
     {
-        public UnityWebRequest UnityWebRequest;
+        [JsonIgnore] public UnityWebRequest UnityWebRequest;
 
         public UnityWebResponse(Config config, Request uxiosRequest, UnityWebRequest webRequest)
         {

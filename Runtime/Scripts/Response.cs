@@ -9,13 +9,6 @@ namespace KindMen.Uxios
     public abstract class Response
     {
         /// <summary>
-        /// Contains the data returned by the request. 
-        /// This is the deserialized content of the response, typically the class you provided, and its type varies
-        /// based on the request configuration.
-        /// </summary>
-        public object Data;
-
-        /// <summary>
         /// Gets the HTTP status code returned by the server.
         /// Indicates the success or failure of the request (e.g., 200 for success, 404 for not found).
         /// </summary>
@@ -26,18 +19,25 @@ namespace KindMen.Uxios
         /// Contains key-value pairs representing HTTP headers, such as "Content-Type" or "Authorization".
         /// </summary>
         public Headers Headers;
-        
-        /// <summary>
-        /// Gets the configuration settings used for the request.
-        /// This includes options such as timeout settings, custom headers, and validation rules.
-        /// </summary>        
-        public Config Config;
-        
+
         /// <summary>
         /// Gets the original request that initiated this response.
         /// Provides access to details about the request, such as the URL and HTTP method.
         /// </summary>
         public Request Request;
+
+        /// <summary>
+        /// Gets the configuration settings used for the request.
+        /// This includes options such as timeout settings, custom headers, and validation rules.
+        /// </summary>        
+        public Config Config;
+
+        /// <summary>
+        /// Contains the data returned by the request. 
+        /// This is the deserialized content of the response, typically the class you provided, and its type varies
+        /// based on the request configuration.
+        /// </summary>
+        public object Data;
 
         /// <summary>
         /// Validates the response status using the validation function defined in the configuration.

@@ -1,33 +1,42 @@
-﻿using UnityEngine;
+﻿using Newtonsoft.Json;
+using UnityEngine;
 
 namespace KindMen.Uxios.Interceptors.NetworkInspector
 {
     public class ConsoleLogger : Logger
     {
-        public override Config OnRequestSuccess(Config request)
+        public override Config OnRequestSuccess(Config config)
         {
-            Debug.Log("Received request using configured URL " + request.Url);
+            var data = JsonConvert.SerializeObject(config, Formatting.Indented);
 
-            return request;
+            Debug.Log($"[UXIOS] Sending request to {config.Url}: \n\n{data}");
+
+            return config;
         }
 
         public override Error OnRequestError(Error error)
         {
-            Debug.LogError("Received error while executing request to " + error.Request.Url + ": " + error.Message);
+            var data = JsonConvert.SerializeObject(error, Formatting.Indented);
+
+            Debug.LogError($"[UXIOS] Error occurred during request to {error.Request.Url}: \n\n{data}");
 
             return error;
         }
 
         public override Response OnResponseSuccess(Response response)
         {
-            Debug.Log("Received response from requested URL " + response.Request.Url);
+            var data = JsonConvert.SerializeObject(response, Formatting.Indented);
+
+            Debug.Log($"[UXIOS] Received response from {response.Request.Url}: \n\n{data}");
             
             return response;
         }
 
         public override Error OnResponseError(Error error)
         {
-            Debug.LogError("Received error while receiving response from " + error.Request.Url + ": " + error.Message);
+            var data = JsonConvert.SerializeObject(error, Formatting.Indented);
+            
+            Debug.LogError($"[UXIOS] Error occurred at {error.Response.Request.Url}: \n\n{data}");
 
             return error;
         }

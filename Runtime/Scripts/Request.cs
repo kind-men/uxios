@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
+using System.Text;
 using KindMen.Uxios.Http;
 using Newtonsoft.Json;
 
@@ -114,13 +114,13 @@ namespace KindMen.Uxios
                 case byte[] asByteArray:
                     return ("application/octet-stream", bytes: asByteArray);
                 case string asString:
-                    return ("text/plain", bytes: System.Text.Encoding.UTF8.GetBytes(asString));
+                    return ("text/plain", bytes: Encoding.UTF8.GetBytes(asString));
                 case object asObject:
                 {
                     // TODO: make setting configurable
                     var serializedString = JsonConvert.SerializeObject(asObject, typeof(T), null);
 
-                    return ("application/json", bytes: System.Text.Encoding.UTF8.GetBytes(serializedString));
+                    return ("application/json", bytes: Encoding.UTF8.GetBytes(serializedString));
                 }
                 default:
                     throw new Exception("Unable to determine how to convert this into a byte array");

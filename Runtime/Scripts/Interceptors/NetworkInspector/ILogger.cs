@@ -2,7 +2,7 @@
 {
     public interface ILogger
     {
-        public Config OnRequestSuccess(Config request);
+        public Config OnRequestSuccess(Config config);
 
         public Error OnRequestError(Error error);
 
