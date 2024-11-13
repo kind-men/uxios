@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using KindMen.Uxios.Http;
+using Newtonsoft.Json;
 using QueryParameters = KindMen.Uxios.Http.QueryParameters;
 
 namespace KindMen.Uxios
@@ -33,11 +34,12 @@ namespace KindMen.Uxios
         public int Timeout = 0;
         public Credentials Auth;
         
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public ExpectedTypeOfResponse TypeOfResponseType = null;
-        
-        public Func<HttpStatusCode, bool> ValidateStatus = status => (int)status >= 200 && (int)status < 300;
+
         public int MaxRedirects = 5;
-        public CancellationToken CancelToken;
+        [JsonIgnore] public Func<HttpStatusCode, bool> ValidateStatus = status => (int)status >= 200 && (int)status < 300;
+        [JsonIgnore] public CancellationToken CancelToken;
         #endregion
 
         public object Clone()
