@@ -15,6 +15,7 @@ nav:
         - 'guides/building-an-automatic-loader.md' 
     - 'Explanation':
         - 'explanation/promises.md'
+        - 'explanation/interceptors.md'
     - 'Reference':
         - 'reference/request.md'
         - 'reference/response.md'
