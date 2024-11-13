@@ -8,7 +8,7 @@ namespace KindMen.Uxios.Interceptors
 
     public sealed class Interceptors
     {
-        public readonly List<RequestInterceptor> request = new();
-        public readonly List<ResponseInterceptor> response = new();
+        public readonly PriorityList<RequestInterceptor> request = new();
+        public readonly PriorityList<ResponseInterceptor> response = new();
     }
 }

@@ -6,16 +6,18 @@ namespace KindMen.Uxios.Interceptors.NetworkInspector
     {
         private bool disposed = false;
 
-        private RequestInterceptor requestInterceptor;
-        private ResponseInterceptor responseInterceptor;
+        private readonly RequestInterceptor requestInterceptor;
+        private readonly ResponseInterceptor responseInterceptor;
 
         public Logger()
         {
             requestInterceptor = new RequestInterceptor(OnRequestSuccess, OnRequestError);
             responseInterceptor = new ResponseInterceptor(OnResponseSuccess, OnResponseError);
 
-            Uxios.Interceptors.request.Add(requestInterceptor);
-            Uxios.Interceptors.response.Add(responseInterceptor);
+            // Loggers are expected to be ran last so that all other interceptors have done their thing; as such
+            // we give them a priority index of 10.000
+            Uxios.Interceptors.request.Add(requestInterceptor, 10000);
+            Uxios.Interceptors.response.Add(responseInterceptor, 10000);
         }
 
         public void Dispose()
