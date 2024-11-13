@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Text;
+#if UNITY_WEBGL
+using UnityEngine.Networking;
+#endif
 
 namespace KindMen.Uxios
 {

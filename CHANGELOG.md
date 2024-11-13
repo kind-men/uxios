@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `RequestInterceptor` was called after `Request` had been created - but must be before so that the interceptors can 
   change the `Config` object, and thus influencing `Request` creation.
+- UnityWebRequest could not be found in QueryString.cs in WebGL builds
 
 ### Changed
 
