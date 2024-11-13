@@ -5,6 +5,17 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2024-11-13
+
+### Added
+
+- Support for directly downloading files and returning a FileInfo object by passing the FileInfo type as a generic
+
+### Changed
+
+- A failure to parse the JSON response would result in an error without response data, but we _do_ want that to debug 
+  the issue, Uxios now resolves the types in a second phase, enabling us to separate this out in a future change
+
 ## [0.1.2] - 2024-11-13
 
 ### Added

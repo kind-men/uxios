@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.IO;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -80,6 +81,26 @@ namespace KindMen.Uxios.Tests.HttpClient
                 {
                     Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
                     Assert.That(response.Data, Is.TypeOf<Texture2D>());
+                }
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator GetsFileAsDownloadedFileInfoReference()
+        {
+            var url = new Uri("https://kind-men.github.io/uxios/images/logo.png");
+
+            var promise = uxios.Get<FileInfo>(url);
+
+            yield return PromiseAssertions.AssertPromiseSucceeds(
+                promise, 
+                response =>
+                {
+                    Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
+                    var responseData = response.Data as FileInfo;
+                    
+                    Assert.That(responseData, Is.Not.Null);
+                    Assert.That(responseData.Length, Is.GreaterThan(0));
                 }
             );
         }
@@ -260,6 +281,9 @@ namespace KindMen.Uxios.Tests.HttpClient
                 promise,
                 exception =>
                 {
+                    Debug.Log(exception);
+                    Debug.Log(exception.Message);
+                    Debug.Log(exception.GetType().ToString());
                     var response = (exception as Error).Response;
                     Assert.That(response, Is.Not.Null);
                     HttpAssertions.AssertStatusCode(response, HttpStatusCode.Unauthorized);

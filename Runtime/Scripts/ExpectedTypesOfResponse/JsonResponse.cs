@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace KindMen.Uxios.ExpectedTypesOfResponse
 {
-    public sealed class JsonResponse : ExpectedTypeOfResponse
+    public sealed class JsonResponse : TextResponse
     {
         public Type DeserializeAs = null;
         public JsonSerializerSettings Settings = new();

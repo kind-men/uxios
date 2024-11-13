@@ -97,6 +97,7 @@ namespace KindMen.Uxios.Transports
             webRequest.downloadHandler = config.TypeOfResponseType switch
             {
                 TextureResponse responseType => new DownloadHandlerTexture(responseType.Readable),
+                FileResponse responseType => new DownloadHandlerFile(responseType.Path),
                 SpriteResponse responseType => new DownloadHandlerTexture(responseType.Readable),
                 _ => new DownloadHandlerBuffer()
             };

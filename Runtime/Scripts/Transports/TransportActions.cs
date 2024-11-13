@@ -1,4 +1,6 @@
 ﻿using System;
+using KindMen.Uxios.ExpectedTypesOfResponse;
+using Newtonsoft.Json;
 using RSG;
 
 namespace KindMen.Uxios.Transports
@@ -23,10 +25,21 @@ namespace KindMen.Uxios.Transports
             Func<Config, Request, Response> responseCreator
         )
         {
+            Response response = null;
+            
             // If an exception occurs in the whole response interpretation chain, reject the promise
             try
             {
-                Response response = responseCreator(config, uxiosRequest);
+                response = responseCreator(config, uxiosRequest);
+
+                // complicated conversions should be done after Response has been created; this will allow an error
+                // during the conversion to result in a valid response object in the error, that can be inspected
+                // TODO: Should this be an interceptor?
+                response.Data = config.TypeOfResponseType switch
+                {
+                    JsonResponse expectedResponse => AsJsonObject(response.Data as string, expectedResponse),
+                    _ => response.Data
+                };
 
                 if (response.IsValid() == false)
                 {
@@ -38,8 +51,26 @@ namespace KindMen.Uxios.Transports
             }
             catch (Exception e)
             {
-                RejectWithErrorDuringResponse(promise, new Error(e.Message, config, null));
+                RejectWithErrorDuringResponse(promise, new Error(e.Message, config, response));
             }
+        }
+        
+        private static object AsJsonObject(string jsonText, JsonResponse expectedResponse)
+        {
+            var expectedType = expectedResponse.DeserializeAs;
+            var settings = expectedResponse.Settings;
+
+            object asJsonObject;
+            try
+            {
+                asJsonObject = JsonConvert.DeserializeObject(jsonText, expectedType, settings);
+            }
+            catch (JsonReaderException e)
+            {
+                throw new Exception("Unable to parse response as JSON, received: " + jsonText, e);
+            }
+
+            return asJsonObject;
         }
 
         public static Config ApplyRequestInterceptors(Config config)

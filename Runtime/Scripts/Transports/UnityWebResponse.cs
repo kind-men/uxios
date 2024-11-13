@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using KindMen.Uxios.ExpectedTypesOfResponse;
 using KindMen.Uxios.Http;
@@ -14,22 +15,47 @@ namespace KindMen.Uxios.Transports
 
         public UnityWebResponse(Config config, Request uxiosRequest, UnityWebRequest webRequest)
         {
-            // TODO apply transformation according to config.responseType and then config.Transforms
-            Data = config.TypeOfResponseType switch
-            {
-                JsonResponse expectedResponse => AsJsonObject(webRequest, expectedResponse),
-                TextResponse _ => webRequest.downloadHandler.text,
-                ArrayBufferResponse _ => webRequest.downloadHandler.data,
-                TextureResponse _ => AsTexture(webRequest),
-                SpriteResponse _ => AsSprite(webRequest),
-                _ => webRequest.downloadHandler.data
-            };
-
             Config = config;
             Status = (HttpStatusCode)webRequest.responseCode;
             Headers = new Headers(webRequest.GetResponseHeaders());
             Request = uxiosRequest;
             UnityWebRequest = webRequest;
+            Data = (UnityWebRequest.downloadHandler is not DownloadHandlerFile) 
+                ? UnityWebRequest.downloadHandler.data // Default to the raw byte[] representation 
+                : null; // unless the DownloadHandler does not support this
+            
+            // TODO: Move this higher up in the chain as a post-step to prevent exceptions here from
+            // preventing the instantiation of request
+            ResolveData();
+        }
+
+        private void ResolveData()
+        {
+            // TODO apply transformation according to config.responseType and then config.Transforms
+            Data = Config.TypeOfResponseType switch
+            {
+                // JsonResponse is not listed on purpose - this is handled in the TransportActions as a post-creation step
+                TextResponse _ => UnityWebRequest.downloadHandler.text,
+                ArrayBufferResponse _ => UnityWebRequest.downloadHandler.data,
+                TextureResponse _ => AsTexture(UnityWebRequest),
+                SpriteResponse _ => AsSprite(UnityWebRequest),
+                FileResponse type => AsFileInfo(UnityWebRequest, type),
+                _ => UnityWebRequest.downloadHandler.data
+            };
+        }
+
+        private FileInfo AsFileInfo(UnityWebRequest webRequest, FileResponse typeOfResponse)
+        {
+            if (webRequest.downloadHandler is not DownloadHandlerFile)
+            {
+                var unexpectedType = webRequest.downloadHandler.GetType();
+                throw new InvalidCastException(
+                    $"The File response expects a DownloadHandlerFile object as DownloadHandler, but an " 
+                    + $"instance of {unexpectedType} was received"
+                );
+            }
+            
+            return new FileInfo(typeOfResponse.Path);
         }
 
         private static Texture2D AsTexture(UnityWebRequest webRequest)
@@ -60,25 +86,6 @@ namespace KindMen.Uxios.Transports
             Texture2D texture = webRequestDownloadHandler.texture;
 
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-        }
-
-        private static object AsJsonObject(UnityWebRequest webRequest, JsonResponse expectedResponse)
-        {
-            var jsonText = webRequest.downloadHandler.text;
-            var expectedType = expectedResponse.DeserializeAs;
-            var settings = expectedResponse.Settings;
-
-            object asJsonObject;
-            try
-            {
-                asJsonObject = JsonConvert.DeserializeObject(jsonText, expectedType, settings);
-            }
-            catch (JsonReaderException e)
-            {
-                throw new Exception("Unable to parse response as JSON, received: " + jsonText, e);
-            }
-
-            return asJsonObject;
         }
     }
 }

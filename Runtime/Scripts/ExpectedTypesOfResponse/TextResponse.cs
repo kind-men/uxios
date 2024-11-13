@@ -2,7 +2,7 @@
 
 namespace KindMen.Uxios.ExpectedTypesOfResponse
 {
-    public sealed class TextResponse : ExpectedTypeOfResponse
+    public class TextResponse : ExpectedTypeOfResponse
     {
         public override void AddMetadataToRequest(Request request)
         {

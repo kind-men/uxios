@@ -22,6 +22,11 @@ namespace KindMen.Uxios
             return new TextureResponse { Readable = readOnly };
         }
 
+        public static ExpectedTypeOfResponse File(string path)
+        {
+            return new FileResponse { Path = path };
+        }
+
         public static ExpectedTypeOfResponse Sprite(bool readOnly = false)
         {
             return new SpriteResponse { Readable = readOnly };
