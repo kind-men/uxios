@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   failed (HTTP 401)
 - ForbiddenError when an authenticated user is not allowed to access the resource (HTTP 403)
 
+### Changed
+
+- Errors now can -and should- have a reference to an innerException for better traceability
+
 ### Fixed
 
 - Errors generated as part of a response were created as a generic error instead of a specific error
