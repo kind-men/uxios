@@ -5,6 +5,19 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- AuthenticationError for all Authentication related errors
+- UnauthorizedError when an unauthenticated user must authenticate to access the resource, or authentication 
+  failed (HTTP 401)
+- ForbiddenError when an authenticated user is not allowed to access the resource (HTTP 403)
+
+### Fixed
+
+- Errors generated as part of a response were created as a generic error instead of a specific error
+
 ## [0.1.3] - 2024-11-13
 
 ### Added

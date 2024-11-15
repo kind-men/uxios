@@ -51,7 +51,10 @@ namespace KindMen.Uxios.Transports
             }
             catch (Exception e)
             {
-                RejectWithErrorDuringResponse(promise, new Error(e.Message, config, response));
+                RejectWithErrorDuringResponse(
+                    promise, 
+                    response != null ? ErrorFactory.Create(response) : new Error(e.Message, config, null)
+                );
             }
         }
         
