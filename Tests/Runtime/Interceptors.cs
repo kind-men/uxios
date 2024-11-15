@@ -26,8 +26,6 @@ namespace KindMen.Uxios.Tests
             errorAssertionException = null;
 
             uxios = new Uxios();
-            Uxios.Interceptors.request.Clear();
-            Uxios.Interceptors.response.Clear();
 
             // All interceptor tests basically use the same settings
             url = new Uri("https://kind-men.com");
@@ -38,7 +36,7 @@ namespace KindMen.Uxios.Tests
         public IEnumerator InterceptSuccessfulRequests()
         {
             bool interceptionIsCalled = false;
-            Uxios.Interceptors.request.Add(new(AssertRequestInterception(configArg =>
+            Uxios.DefaultInstance.Interceptors.request.Add(new(AssertRequestInterception(configArg =>
             {
                 Assert.That(configArg, Is.TypeOf<Config>());
                 interceptionIsCalled = true;
@@ -61,7 +59,7 @@ namespace KindMen.Uxios.Tests
         public IEnumerator InterceptSuccessfulResponses()
         {
             bool interceptionIsCalled = false;
-            Uxios.Interceptors.response.Add(new(AssertResponseInterception(responseArg =>
+            Uxios.DefaultInstance.Interceptors.response.Add(new(AssertResponseInterception(responseArg =>
             {
                 interceptionIsCalled = true;
                 Assert.That(responseArg.Config, Is.TypeOf<Config>());
@@ -88,7 +86,7 @@ namespace KindMen.Uxios.Tests
         public IEnumerator InterceptRejectedResponses()
         {
             bool interceptionIsCalled = false;
-            Uxios.Interceptors.response.Add(new(AssertErrorInterception(error =>
+            Uxios.DefaultInstance.Interceptors.response.Add(new(AssertErrorInterception(error =>
             {
                 interceptionIsCalled = true;
                 Assert.That(error.Response.Config, Is.TypeOf<Config>());

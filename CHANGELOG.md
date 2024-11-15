@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Errors now can -and should- have a reference to an innerException for better traceability
+- Json conversion is now done as a system-default response interception
+- Interceptors are no longer static - but for the moment only the ones on the default instance are executed. A future
+  change will make interceptors instance specific and copy an initial set from the default instance; similar 
+  to `axios.create()`
 
 ### Fixed
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using KindMen.Uxios.Interceptors;
 using KindMen.Uxios.Transports;
 using RSG;
 using UnityEngine;
@@ -10,7 +11,7 @@ namespace KindMen.Uxios
     public sealed class Uxios
     {
         private static Uxios defaultInstance;
-        public static Interceptors.Interceptors Interceptors { get; } = new();
+        public Interceptors.Interceptors Interceptors { get; } = new();
 
         private readonly IUxiosTransport uxiosTransport;
         private readonly Config defaultConfig;
@@ -26,7 +27,8 @@ namespace KindMen.Uxios
         /// <summary>
         /// Default constructor - when all you need is to make HTTP Requests.
         /// </summary>
-        public Uxios() : this(config: new Config()) {
+        public Uxios() : this(config: new Config())
+        {
         }
 
         /// <summary>
@@ -41,6 +43,10 @@ namespace KindMen.Uxios
             this.defaultConfig = config;
             this.uxiosTransport = transport ?? UnityWebRequestTransport.Instance();
             this.expectedTypeOfResponseResolver = expectedTypeOfResponseResolver ?? new ExpectedTypeOfResponseResolver();
+
+            // Load default Interceptors; we may add more later
+            var jsonConverter = new JsonConverter();
+            Interceptors.response.Add(new ResponseInterceptor(jsonConverter.OnResponseSuccess), jsonConverter.Priority);
         }
 
         public Promise<Response> Request<TData>(Config config = null) where TData : class

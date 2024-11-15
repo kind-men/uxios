@@ -1,4 +1,5 @@
 ﻿using System;
+using static KindMen.Uxios.Interceptors.Interceptors;
 
 namespace KindMen.Uxios.Interceptors.NetworkInspector
 {
@@ -14,18 +15,16 @@ namespace KindMen.Uxios.Interceptors.NetworkInspector
             requestInterceptor = new RequestInterceptor(OnRequestSuccess, OnRequestError);
             responseInterceptor = new ResponseInterceptor(OnResponseSuccess, OnResponseError);
 
-            // Loggers are expected to be ran last so that all other interceptors have done their thing; as such
-            // we give them a priority index of 10.000
-            Uxios.Interceptors.request.Add(requestInterceptor, 10000);
-            Uxios.Interceptors.response.Add(responseInterceptor, 10000);
+            Uxios.DefaultInstance.Interceptors.request.Add(requestInterceptor, DefaultLoggingPriority);
+            Uxios.DefaultInstance.Interceptors.response.Add(responseInterceptor, DefaultLoggingPriority);
         }
 
         public void Dispose()
         {
             if (disposed) return;
 
-            Uxios.Interceptors.request.Remove(requestInterceptor);
-            Uxios.Interceptors.response.Remove(responseInterceptor);
+            Uxios.DefaultInstance.Interceptors.request.Remove(requestInterceptor);
+            Uxios.DefaultInstance.Interceptors.response.Remove(responseInterceptor);
 
             disposed = true;
         }

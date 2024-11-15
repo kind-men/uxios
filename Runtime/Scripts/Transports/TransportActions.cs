@@ -32,15 +32,7 @@ namespace KindMen.Uxios.Transports
             try
             {
                 response = responseCreator(config, uxiosRequest);
-
-                // complicated conversions should be done after Response has been created; this will allow an error
-                // during the conversion to result in a valid response object in the error, that can be inspected
-                // TODO: Should this be an interceptor?
-                response.Data = config.TypeOfResponseType switch
-                {
-                    JsonResponse expectedResponse => AsJsonObject(response.Data as string, expectedResponse),
-                    _ => response.Data
-                };
+                response = ApplyResponseInterceptors(response);
 
                 if (response.IsValid() == false)
                 {
@@ -48,7 +40,7 @@ namespace KindMen.Uxios.Transports
                     return;
                 }
 
-                promise.Resolve(ApplyResponseInterceptors(response));
+                promise.Resolve(response);
             }
             catch (JsonReaderException e)
             {
@@ -67,28 +59,10 @@ namespace KindMen.Uxios.Transports
                 );
             }
         }
-        
-        private static object AsJsonObject(string jsonText, JsonResponse expectedResponse)
-        {
-            var expectedType = expectedResponse.DeserializeAs;
-            var settings = expectedResponse.Settings;
-
-            object asJsonObject;
-            try
-            {
-                asJsonObject = JsonConvert.DeserializeObject(jsonText, expectedType, settings);
-            }
-            catch (JsonReaderException e)
-            {
-                throw new JsonReaderException("Unable to parse response as JSON, received: " + jsonText, e);
-            }
-
-            return asJsonObject;
-        }
 
         public static Config ApplyRequestInterceptors(Config config)
         {
-            foreach (var requestInterceptor in Uxios.Interceptors.request)
+            foreach (var requestInterceptor in Uxios.DefaultInstance.Interceptors.request)
             {
                 config = requestInterceptor.success.Invoke(config);
             }
@@ -98,7 +72,7 @@ namespace KindMen.Uxios.Transports
 
         public static Response ApplyResponseInterceptors(Response response)
         {
-            foreach (var responseInterceptor in Uxios.Interceptors.response)
+            foreach (var responseInterceptor in Uxios.DefaultInstance.Interceptors.response)
             {
                 response = responseInterceptor.success.Invoke(response);
             }
@@ -113,7 +87,7 @@ namespace KindMen.Uxios.Transports
 
         public static void RejectWithErrorDuringRequest(Promise<Response> promise, Error error)
         {
-            foreach (var interceptor in Uxios.Interceptors.request)
+            foreach (var interceptor in Uxios.DefaultInstance.Interceptors.request)
             {
                 error = interceptor.error.Invoke(error);
             }
@@ -123,7 +97,7 @@ namespace KindMen.Uxios.Transports
 
         public static void RejectWithErrorDuringResponse(Promise<Response> promise, Error error)
         {
-            foreach (var responseInterceptor in Uxios.Interceptors.response)
+            foreach (var responseInterceptor in Uxios.DefaultInstance.Interceptors.response)
             {
                 error = responseInterceptor.error.Invoke(error);
             }
