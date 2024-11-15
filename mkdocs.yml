@@ -1,6 +1,5 @@
 nav:
   - 'About Uxios':
-    - "About Uxios": 'index.md'
     - 'features.md'
     - 'why-use-uxios-instead-of-unitywebrequest.md'
     - 'why-axios.md'
@@ -24,6 +23,7 @@ nav:
 # Includes, starting with an underscore - https://www.mkdocs.org/user-guide/configuration/#not_in_nav
 not_in_nav: |
   _*.md
+  index.md
 
 site_name: ""
 docs_dir: "Documentation~"
@@ -39,7 +39,7 @@ theme:
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: white
-      accent: indigo
+      accent: pink
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode

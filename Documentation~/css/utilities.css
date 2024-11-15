@@ -1,4 +1,134 @@
-﻿.hidden {
+﻿@import url('https://fonts.googleapis.com/css2?family=Wendy+One&display=swap');
+
+.hidden {
     display: none;
     visibility: hidden;
+}
+
+.md-typeset h1 {
+    font-family: 'Wendy One', sans-serif;
+    font-size: 1.85rem;
+    line-height: 1;
+    margin-bottom: 1.25rem;
+    color: #DC81CA;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/*****************************************************************************/
+/** Full-width tricks ********************************************************/
+/*****************************************************************************/
+
+.md-container {
+    /**
+    We use tricks to create a full-width background color,
+    but hiding the overflow prevents the page from breaking
+    **/
+    overflow: hidden;
+}
+
+/*****************************************************************************/
+/** HERO *********************************************************************/
+/*****************************************************************************/
+
+.hero {
+    margin-top: -1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.hero img {
+    width: 100% !important;
+}
+
+.hero p {
+    margin: 0;
+    padding: 0;
+}
+
+@media screen and (min-width: 425px) {
+    .hero {
+        margin: -2.5rem calc(50% - 50vw) 2.5rem;
+    }
+}
+
+/*****************************************************************************/
+/** Full Width Colored Sections **********************************************/
+/*****************************************************************************/
+
+.full-width {
+    position: relative;
+    padding: 1rem 0;
+}
+
+.full-width::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -50vw;
+    right: -50vw;
+    background-color: #f7f7f7;
+    z-index: -1;
+}
+
+.md-content__inner > .full-width:last-child {
+    margin-bottom: -2rem;
+}
+
+/*****************************************************************************/
+/** Specialised styling for the 'In Samenwerking Met' card section ***********/
+/*****************************************************************************/
+
+.in-cooperation-with {
+    /* make sure heading padding doesn't collapse, but don't add a significant padding ourselves */
+    padding-top: 0.1rem;
+    margin-top: 2.5rem;
+}
+.md-typeset .in-cooperation-with__partners {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+}
+.md-typeset .in-cooperation-with__partners li {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+.md-typeset .in-cooperation-with__partners img {
+    max-height: 150px;
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
+.md-typeset .in-cooperation-with__partners img:hover {
+    filter: grayscale(0%);
+    opacity: 1;
+}
+
+/*****************************************************************************/
+/** Two column flex layout ***************************************************/
+/*****************************************************************************/
+
+.two-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.two-column + .two-column {
+    margin-top: 1.5rem;
+    border-top: 2px dotted var(--md-default-fg-color--lighter);
+    padding-top: 1.5rem;
+}
+
+@media screen and (min-width: 768px) {
+    .two-column {
+        gap: 2rem;
+        flex-direction: row;
+    }
+
+    .two-column h2,
+    .two-column h3
+    {
+        flex: 0 0 16.66667%;
+
+        margin-top: .7rem;
+        padding-top: 0;
+    }
 }
