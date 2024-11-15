@@ -1,4 +1,5 @@
 ﻿using System;
+using KindMen.Uxios.Errors;
 using KindMen.Uxios.ExpectedTypesOfResponse;
 using Newtonsoft.Json;
 using RSG;
@@ -49,11 +50,20 @@ namespace KindMen.Uxios.Transports
 
                 promise.Resolve(ApplyResponseInterceptors(response));
             }
+            catch (JsonReaderException e)
+            {
+                RejectWithErrorDuringResponse(
+                    promise, 
+                    new DataProcessingError(e.Message, config, response)
+                );
+            }
             catch (Exception e)
             {
                 RejectWithErrorDuringResponse(
                     promise, 
-                    response != null ? ErrorFactory.Create(response) : new Error(e.Message, config, null)
+                    response != null 
+                        ? ErrorFactory.Create(response, e) 
+                        : new DataProcessingError(e.Message, config, null, e)
                 );
             }
         }
@@ -70,7 +80,7 @@ namespace KindMen.Uxios.Transports
             }
             catch (JsonReaderException e)
             {
-                throw new Exception("Unable to parse response as JSON, received: " + jsonText, e);
+                throw new JsonReaderException("Unable to parse response as JSON, received: " + jsonText, e);
             }
 
             return asJsonObject;

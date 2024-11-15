@@ -288,7 +288,7 @@ namespace KindMen.Uxios.Tests.HttpClient
                     Assert.That(response, Is.Not.Null);
                     HttpAssertions.AssertStatusCode(response, HttpStatusCode.Unauthorized);
     
-                    Assert.That(response.Data, Is.Null);
+                    Assert.That(response.Data, Is.Empty);
                 }
             );
         }

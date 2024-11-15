@@ -2,18 +2,18 @@
 
 namespace KindMen.Uxios
 {
-    public class Error : Exception
+    public abstract class Error : Exception
     {
         public readonly Config Request;
         public readonly Response Response;
 
-        public Error(Config request, Response response) : base()
+        protected Error(string message, Config request, Response response) : base(message)
         {
             Request = request;
             Response = response;
         }
 
-        public Error(string message, Config request, Response response) : base(message)
+        protected Error(string message, Config request, Response response, Exception innerException) : base(message, innerException)
         {
             Request = request;
             Response = response;
