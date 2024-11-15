@@ -26,6 +26,8 @@ not_in_nav: |
   index.md
 
 site_name: ""
+repo_name: kind-men/uxios
+repo_url: https://github.com/kind-men/uxios
 docs_dir: "Documentation~"
 site_description: "A Unity-native, Axios-inspired HTTP client for streamlined, typed, and extensible networking across platforms."
 extra_css:
@@ -35,6 +37,8 @@ theme:
   logo: images/logo.png
   favicon: images/favicon.ico
   language: en
+  icon:
+    repo: fontawesome/brands/github
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -45,7 +49,7 @@ theme:
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: black
+      primary: pink
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
