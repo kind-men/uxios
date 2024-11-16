@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Errors generated as part of a response were created as a generic error instead of a specific error
+- Bug where an empty response in an error would throw an "Invalid Cast" issue and blocking error handling
 
 ## [0.1.3] - 2024-11-13
 

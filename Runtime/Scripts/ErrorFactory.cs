@@ -10,11 +10,11 @@ namespace KindMen.Uxios
         {
             return (int)response.Status switch
             {
-                404 => new NotFoundError((string)response.Data, response.Config, response, e),
-                401 => new UnauthorizedError((string)response.Data, response.Config, response, e),
-                403 => new ForbiddenError((string)response.Data, response.Config, response, e),
-                >= 400 and < 500 => new HttpClientError((string)response.Data, response.Config, response, e),
-                >= 500 and < 600 => new HttpServerError((string)response.Data, response.Config, response, e),
+                404 => new NotFoundError(response.Data as string, response.Config, response, e),
+                401 => new UnauthorizedError(response.Data as string, response.Config, response, e),
+                403 => new ForbiddenError(response.Data as string, response.Config, response, e),
+                >= 400 and < 500 => new HttpClientError(response.Data as string, response.Config, response, e),
+                >= 500 and < 600 => new HttpServerError(response.Data as string, response.Config, response, e),
                 _ => new ProtocolError(e.Message, response.Config, response, e)
             };
         }
