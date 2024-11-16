@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UnauthorizedError when an unauthenticated user must authenticate to access the resource, or authentication 
   failed (HTTP 401)
 - ForbiddenError when an authenticated user is not allowed to access the resource (HTTP 403)
+- Support for Templated URI's, you can prepare a templated URI that will resolve with given parameters
 
 ### Changed
 
