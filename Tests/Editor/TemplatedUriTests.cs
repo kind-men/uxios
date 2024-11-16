@@ -37,6 +37,24 @@ namespace KindMen.Uxios.Tests
             var templatedUri = new TemplatedUri("https://example.com/users/{userId}/posts/{postId}", parameters);
             var resolvedUri = templatedUri.ToString();
 
+            // The used parameters should be removed as they are 'consumed'
+            Assert.That(parameters, Is.Empty);
+            Assert.AreEqual("https://example.com/users/123/posts/456", resolvedUri);
+        }
+
+        [Test]
+        public void ReplacesTemplatePartsWithQueryParametersAddedLater()
+        {
+            var parameters = new QueryParameters {{"userId", "123"}};
+            var templatedUri = new TemplatedUri("https://example.com/users/{userId}/posts/{postId}", parameters);
+            
+            // Add postId after the fact to make it easier to work with templates
+            var appendedUri = templatedUri.With("postId", "456");
+            
+            var resolvedUri = appendedUri.ToString();
+
+            // The used parameters should be removed as they are 'consumed'
+            Assert.That(parameters, Is.Empty);
             Assert.AreEqual("https://example.com/users/123/posts/456", resolvedUri);
         }
 

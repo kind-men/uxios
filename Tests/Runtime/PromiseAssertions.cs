@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using KindMen.Uxios.Errors;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using RSG;
 
@@ -12,8 +14,13 @@ namespace KindMen.Uxios.Tests
             return AssertPromise(
                 promise,
                 onSuccess,
-                e => Assert.Fail("An error should not have occurred, received: " + e.Message)
-            );
+                e =>
+                {
+                    var errorMessage = "An error should not have occurred, received: " + e.Message;
+                    errorMessage += "\n" + JsonConvert.SerializeObject((e as Error)?.Response, Formatting.Indented);
+
+                    Assert.Fail(errorMessage);
+                });
         }
 
         public static IEnumerator AssertPromiseErrorsWithMessage<TResponse>(Promise<TResponse> promise, string startsWith)

@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using QueryParameters = KindMen.Uxios.Http.QueryParameters;
 
 namespace KindMen.Uxios.Tests.HttpClient
 {
@@ -217,6 +218,49 @@ namespace KindMen.Uxios.Tests.HttpClient
                 response =>
                 {
                     Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
+                    Assert.That(response.Data, Is.TypeOf<ExamplePost>());
+                    AssertCanonicalPost(response.Data as ExamplePost);
+                }
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator UseUriTemplateToResolveDynamicUriParts()
+        {
+            var url = new TemplatedUri("https://jsonplaceholder.typicode.com/posts/{id}");
+
+            var promise = uxios.Get<ExamplePost>(url.With("id", "1"));
+
+            yield return PromiseAssertions.AssertPromiseSucceeds(
+                promise, 
+                response =>
+                {
+                    Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
+                    Assert.That(response.Request.Url.ToString(), Is.EqualTo("https://jsonplaceholder.typicode.com/posts/1"));
+                    Assert.That(response.Request.QueryString, Is.Empty);
+                    Assert.That(response.Data, Is.TypeOf<ExamplePost>());
+                    AssertCanonicalPost(response.Data as ExamplePost);
+                }
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator UriTemplatesWillConsumeQueryParametersWhenPartsAreUnresolved()
+        {
+            var url = new TemplatedUri("https://jsonplaceholder.typicode.com/posts/{id}");
+
+            // Add a param, independently of the provided template
+            var config = new Config().AddParam("id", "1");
+            
+            var promise = uxios.Get<ExamplePost>(url.Using(config.Params), config);
+
+            yield return PromiseAssertions.AssertPromiseSucceeds(
+                promise, 
+                response =>
+                {
+                    Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
+                    Assert.That(response.Request.Url.ToString(), Is.EqualTo("https://jsonplaceholder.typicode.com/posts/1"));
+                    Assert.That(response.Request.QueryString, Is.Empty);
                     Assert.That(response.Data, Is.TypeOf<ExamplePost>());
                     AssertCanonicalPost(response.Data as ExamplePost);
                 }

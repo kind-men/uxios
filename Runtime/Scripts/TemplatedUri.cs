@@ -1,24 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
-using QueryParameters = KindMen.Uxios.Http.QueryParameters;
+using UriParameters = KindMen.Uxios.Http.QueryParameters;
 
 namespace KindMen.Uxios
 {
     public class TemplatedUri
     {
         private readonly Uri uri;
-        private readonly QueryParameters parameters;
+        private UriParameters parameters;
 
-        public TemplatedUri(Uri uri, QueryParameters parameters = null)
+        public TemplatedUri(Uri uri, UriParameters parameters = null)
         {
             this.uri = uri;
-            this.parameters = parameters ?? new QueryParameters();
+            this.parameters = parameters ?? new UriParameters();
         }
         
-        public TemplatedUri(string uri, QueryParameters parameters = null)
+        public TemplatedUri(string uri, UriParameters parameters = null) : this(new Uri(uri), parameters)
         {
-            this.uri = new Uri(uri);
-            this.parameters = parameters ?? new QueryParameters();
+        }
+
+        /// <summary>
+        /// Fluidly add parameters so that the templated URI can be used a template without initial parameters, and
+        /// it can be chained into calls with more readability
+        /// </summary>
+        public TemplatedUri With(string key, string value)
+        {
+            // The parameters collection is replaced with a new one so that the UriTemplate can really be used as a
+            // template, and we do not inadvertently alter the original parameters
+            var newParameters = new UriParameters(parameters);
+            newParameters.Add(key, value);
+
+            // Return a new instance with a similar footprint, this will have the original TemplatedUri remain untouched
+            // and reusable as a template for other locations.
+            return new TemplatedUri(uri, newParameters);
+        }
+
+        /// <summary>
+        /// Fluidly use parameters from another collection so that the templated URI can be used a template without
+        /// initial parameters, and it can be chained into calls with more readability. Any parameters used in the
+        /// process are consumed upon resolving, and will be removed so that only unused parameters remain.
+        /// </summary>
+        public TemplatedUri Using(UriParameters parameters)
+        {
+            // Return a new instance with a similar footprint, this will have the original TemplatedUri remain untouched
+            // and reusable as a template for other locations.
+            return new TemplatedUri(uri, parameters);
         }
 
         private Uri Resolve()
@@ -30,7 +56,7 @@ namespace KindMen.Uxios
 
             foreach (var uriTemplatePart in GetUriTemplateParts())
             {
-                var replacement = parameters.Get(uriTemplatePart);
+                var replacement = parameters.Consume(uriTemplatePart);
                 if (replacement == null) continue;
 
                 pathAndQuery = pathAndQuery.Replace(

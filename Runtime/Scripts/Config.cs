@@ -62,5 +62,12 @@ namespace KindMen.Uxios
                 CancelToken = CancelToken
             };
         }
+
+        public Config AddParam(string key, string value)
+        {
+            Params.Add(key, value);
+
+            return this;
+        }
     }
 }
