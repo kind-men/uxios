@@ -2,11 +2,12 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Net;
+using System.Threading;
+using KindMen.Uxios.Errors;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using QueryParameters = KindMen.Uxios.Http.QueryParameters;
 
 namespace KindMen.Uxios.Tests.HttpClient
 {
@@ -124,8 +125,6 @@ namespace KindMen.Uxios.Tests.HttpClient
             );
         }
 
-        // TODO: Add more error scenario's, such as CORS, DNS not found, timeout (difficult one to test) and 
-        //       a Unity DataProcessingError (trying to load a JSON as a Texture I think); use https://httpbin.org/
         [UnityTest]
         public IEnumerator ErrorIfItCannotFindUrl()
         {
@@ -162,6 +161,33 @@ namespace KindMen.Uxios.Tests.HttpClient
                     Assert.That(error, Is.Not.Null);
                     Assert.That(error.Response, Is.Null);
                     Assert.That(error.Message, Is.EqualTo("Request timeout"));
+                }
+            );
+        }
+        
+        [UnityTest]
+        public IEnumerator CancelARequest()
+        {
+            var url = new Uri("https://httpbin.org/delay/10");
+
+            var cancellationSource = new CancellationTokenSource();
+            
+            var customConfig = Config.Default();
+            var configWithCancellation = customConfig.CancelUsing(cancellationSource);
+            var promise = uxios.Get<string>(url, configWithCancellation);
+
+            yield return new WaitForSeconds(1);
+            cancellationSource.Cancel();
+            
+            yield return PromiseAssertions.AssertPromiseErrors(
+                promise, 
+                e =>
+                {
+                    var error = e as Error;
+                    Assert.That(error, Is.Not.Null);
+                    Assert.That(error, Is.TypeOf<ConnectionError>());
+                    Assert.That(error.Response, Is.Null);
+                    Assert.That(error.Message, Is.EqualTo("Request aborted"));
                 }
             );
         }

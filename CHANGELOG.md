@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   failed (HTTP 401)
 - ForbiddenError when an authenticated user is not allowed to access the resource (HTTP 403)
 - Support for Templated URI's, you can prepare a templated URI that will resolve with given parameters
+- Full support for cancellation sources/tokens
 
 ### Changed
 
@@ -22,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Interceptors are no longer static - but for the moment only the ones on the default instance are executed. A future
   change will make interceptors instance specific and copy an initial set from the default instance; similar 
   to `axios.create()`
+- Config is no longer cloneable - a new static method has been introduced that creates a new Config based on another
 
 ### Fixed
 

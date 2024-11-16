@@ -1,4 +1,8 @@
-﻿# Using `Resource` to fetch Pokémon
+﻿---
+title: "Using 'Resource' to fetch Pokémon"
+---
+
+# Using `Resource` to fetch Pokémon
 
 The Pokémon API is a RESTful API that provides data on Pokémon, moves, abilities, and more. In this example, we’ll use
 it to retrieve data for a specific Pokémon by its ID or name.

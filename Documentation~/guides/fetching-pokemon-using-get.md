@@ -1,4 +1,8 @@
-﻿# Using `Uxios.Get` to fetch Pokémon
+﻿---
+title: "Using 'Uxios.Get' to fetch Pokémon"
+---
+
+# Using `Uxios.Get` to fetch Pokémon
 
 This guide will walk you through using Uxios’s `Get` method to retrieve a typed Pokémon object from
 the [Pokémon API](https://pokeapi.co/). This method allows flexibility by letting you add custom configurations to each

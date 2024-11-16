@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -10,17 +8,12 @@ using QueryParameters = KindMen.Uxios.Http.QueryParameters;
 
 namespace KindMen.Uxios
 {
-    public sealed class Config : ICloneable
+    public sealed class Config
     {
-        public delegate object RequestTransformer(object data, Headers headers);
-        public delegate object ResponseTransformer(object data);
-
         #region Ported axios fields
         public Uri Url;
         public HttpMethod Method = HttpMethod.Get;
         public Uri BaseUrl;
-        public List<RequestTransformer> TransformRequest = new(); // TODO: Do something with this
-        public List<ResponseTransformer> TransformResponse = new(); // TODO: Do something with this
         public Headers Headers = new();
         public QueryParameters Params = new();
         public object Data;
@@ -39,33 +32,67 @@ namespace KindMen.Uxios
 
         public int MaxRedirects = 5;
         [JsonIgnore] public Func<HttpStatusCode, bool> ValidateStatus = status => (int)status >= 200 && (int)status < 300;
-        [JsonIgnore] public CancellationToken CancelToken;
+        [JsonIgnore] public CancellationToken CancelToken = CancellationToken.None;
         #endregion
 
-        public object Clone()
+        public static Config Default()
+        {
+            return new Config();
+        }
+        
+        public static Config BasedOn(Config config)
         {
             return new Config
             {
-                Url = Url,
-                Method = Method,
-                BaseUrl = BaseUrl,
-                TransformRequest = TransformRequest.ToList(),
-                TransformResponse = TransformResponse.ToList(),
-                Headers = new Headers(Headers),
-                Params = new QueryParameters(Params),
-                Data = Data,
-                Timeout = Timeout,
-                Auth = Auth,
-                TypeOfResponseType = TypeOfResponseType,
-                ValidateStatus = ValidateStatus,
-                MaxRedirects = MaxRedirects,
-                CancelToken = CancelToken
+                // Uri's are immutable - so I do not have to copy it
+                Url = config.Url,
+                Method = config.Method,
+                BaseUrl = config.BaseUrl,
+                // Headers and Params are not immutable, and collection types, so they need to be duplicated
+                Headers = new Headers(config.Headers),
+                Params = new QueryParameters(config.Params),
+                Data = config.Data,
+                Timeout = config.Timeout,
+                Auth = config.Auth,
+                TypeOfResponseType = config.TypeOfResponseType,
+                ValidateStatus = config.ValidateStatus,
+                MaxRedirects = config.MaxRedirects,
+                CancelToken = config.CancelToken
             };
+        }
+        
+        public Config At(Uri url)
+        {
+            Url = url;
+
+            return this;
+        }
+
+        public Config At(Uri url, Uri baseUrl)
+        {
+            Url = url;
+            BaseUrl ??= baseUrl;
+
+            return this;
+        }
+
+        public Config UsingMethod(HttpMethod method)
+        {
+            Method = method;
+
+            return this;
         }
 
         public Config AddParam(string key, string value)
         {
             Params.Add(key, value);
+
+            return this;
+        }
+
+        public Config CancelUsing(CancellationTokenSource cancellationSource)
+        {
+            CancelToken = cancellationSource.Token;
 
             return this;
         }

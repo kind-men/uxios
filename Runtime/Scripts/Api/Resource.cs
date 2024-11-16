@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using KindMen.Uxios.Errors.Http;
 using KindMen.Uxios.Http;
 using RSG;
@@ -6,10 +7,10 @@ using RSG;
 namespace KindMen.Uxios.Api
 {
     // TODO: Add cache staleness checks?
-    public class Resource<T> where T : class
+    public class Resource<TResponse> where TResponse : class
     {
         private readonly Uri iri;
-        private T _cachedValue;
+        private TResponse _cachedValue;
         private readonly Uxios uxios;
         private readonly Config config;
 
@@ -23,21 +24,48 @@ namespace KindMen.Uxios.Api
             };
         }
 
-        public static Resource<T> At(Uri url)
+        public static Resource<TResponse> At(Uri url)
         {
-            return new Resource<T>(url);
+            return new Resource<TResponse>(url);
         }
 
-        public static Resource<T> At(string url)
+        public static Resource<TResponse> At(string url)
         {
-            return new Resource<T>(new Uri(url));
+            return new Resource<TResponse>(new Uri(url));
         }
 
-        public Resource<T> With(QueryParameters parameters)
+        /// <summary>
+        /// When it is time, get the resource with the given set of query parameters.
+        /// </summary>
+        public Resource<TResponse> With(QueryParameters parameters)
         {
             // Changing these parameters will make the cache invalid
             InvalidateCache();
             config.Params = parameters;
+
+            return this;
+        }
+
+        /// <summary>
+        /// When it is time, get the resource with the given query parameter in addition to other defined ones.
+        /// </summary>
+        public Resource<TResponse> With(KeyValuePair<string, string> parameter)
+        {
+            // Changing these parameters will make the cache invalid
+            InvalidateCache();
+            config.Params.Add(parameter.Key, parameter.Value);
+
+            return this;
+        }
+
+        /// <summary>
+        /// When it is time, get or update the resource with the given data as its body.
+        /// </summary>
+        public Resource<TResponse> With<TRequestData>(TRequestData data)
+        {
+            // Changing these parameters will make the cache invalid
+            InvalidateCache();
+            config.Data = data;
 
             return this;
         }
@@ -58,24 +86,24 @@ namespace KindMen.Uxios.Api
             }
         }
 
-        public Promise<T> Value
+        public Promise<TResponse> Value
         {
             get
             {
                 // Transparently return the cached value; no need to refresh it unless it goes stale
                 if (_cachedValue != null)
                 {
-                    return Promise<T>.Resolved(_cachedValue) as Promise<T>;
+                    return Promise<TResponse>.Resolved(_cachedValue) as Promise<TResponse>;
                 }
 
-                return FetchResourceAsync().Then(arg => _cachedValue = arg) as Promise<T>;
+                return FetchResourceAsync().Then(arg => _cachedValue = arg) as Promise<TResponse>;
             }
         }
 
         // Set or update the resource with new data
-        public Promise<T> Update(T updatedValue)
+        public Promise<TResponse> Update(TResponse updatedValue)
         {
-            return UpdateResourceAsync(updatedValue).Then(arg => _cachedValue = updatedValue) as Promise<T>;
+            return UpdateResourceAsync(updatedValue).Then(arg => _cachedValue = updatedValue) as Promise<TResponse>;
         }
 
         public Promise Remove()
@@ -83,16 +111,16 @@ namespace KindMen.Uxios.Api
             return DeleteResourceAsync();
         }
 
-        private Promise<T> FetchResourceAsync()
+        private Promise<TResponse> FetchResourceAsync()
         {
-            return uxios.Get<T>(iri, config)
-                .Then(response => response.Data as T) as Promise<T>;
+            return uxios.Get<TResponse>(iri, config)
+                .Then(response => response.Data as TResponse) as Promise<TResponse>;
         }
 
-        private Promise<T> UpdateResourceAsync(T updatedResource)
+        private Promise<TResponse> UpdateResourceAsync(TResponse updatedResource)
         {
-            return uxios.Put<T, T>(iri, updatedResource, config)
-                .Then(response => response.Data as T) as Promise<T>;
+            return uxios.Put<TResponse, TResponse>(iri, updatedResource, config)
+                .Then(response => response.Data as TResponse) as Promise<TResponse>;
         }
 
         private Promise DeleteResourceAsync()

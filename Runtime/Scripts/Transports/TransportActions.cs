@@ -12,7 +12,7 @@ namespace KindMen.Uxios.Transports
         {
             // Clone config so that any changes we do - do not affect the caller; as this may mess with the global
             // config if that is used
-            config = config.Clone() as Config;
+            config = Config.BasedOn(config);
 
             config = ApplyRequestInterceptors(config);
 

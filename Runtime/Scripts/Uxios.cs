@@ -49,90 +49,71 @@ namespace KindMen.Uxios
             Interceptors.response.Add(new ResponseInterceptor(jsonConverter.OnResponseSuccess), jsonConverter.Priority);
         }
 
-        public Promise<Response> Request<TData>(Config config = null) where TData : class
+        private Promise<Response> Request<TData>(Config config) where TData : class
         {
-            config ??= this.defaultConfig.Clone() as Config;
-
             // When the user or none of the other methods set a response type, grab the default one from the resolver
-            config!.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve(config); 
+            config.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve(config); 
 
             return uxiosTransport.PerformRequest<TData>(config);
         }
 
         public Promise<Response> Get(Uri url, Config config = null)
         {
-            config ??= this.defaultConfig;
+            config = Config.BasedOn(config ?? defaultConfig)
+                .At(url)
+                .UsingMethod(HttpMethod.Get);
 
-            var clone = config.Clone() as Config;
-            clone!.Url = url;
-            clone!.Method = HttpMethod.Get;
-
-            return Request<byte[]>(clone);
+            return Request<byte[]>(config);
         }
 
         public Promise<Response> Get(Uri url, QueryParameters parameters, Config config = null)
         {
-            config ??= this.defaultConfig;
+            config = Config.BasedOn(config ?? defaultConfig);
+            config.Params = parameters;
 
-            var clone = config.Clone() as Config;
-            clone!.Params = parameters;
-
-            return Get(url, clone);
+            return Get(url, config);
         }
 
         public Promise<Response> Get<TResponse>(Uri url, Config config = null)
         {
-            config ??= this.defaultConfig;
+            config = Config.BasedOn(config ?? defaultConfig);
 
-            var clone = config.Clone() as Config;
-            clone!.Url = url;
-            clone!.Method = HttpMethod.Get;
-            clone!.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(clone);
+            config.At(url).UsingMethod(HttpMethod.Get);
+            config.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(config);
 
-            return Request<byte[]>(clone);
+            return Request<byte[]>(config);
         }
 
         public Promise<Response> Get<TResponse>(Uri url, QueryParameters parameters, Config config = null)
         {
-            config ??= this.defaultConfig;
+            config = Config.BasedOn(config ?? defaultConfig);
+            config.Params = parameters;
 
-            var clone = config.Clone() as Config;
-            clone!.Params = parameters;
-
-            return Get<TResponse>(url, clone);
+            return Get<TResponse>(url, config);
         }
 
         public Promise<Response> Delete(Uri url, Config config = null)
         {
-            config ??= this.defaultConfig;
+            config = Config.BasedOn(config ?? defaultConfig);
+            config.At(url).UsingMethod(HttpMethod.Delete);
 
-            var clone = config.Clone() as Config;
-            clone!.Url = url;
-            clone!.Method = HttpMethod.Delete;
-
-            return Request<byte[]>(clone);
+            return Request<byte[]>(config);
         }
 
         public Promise<Response> Head(Uri url, Config config = null)
         {
-            config ??= this.defaultConfig;
+            config = Config.BasedOn(config ?? defaultConfig);
+            config.At(url).UsingMethod(HttpMethod.Head);
 
-            var clone = config.Clone() as Config;
-            clone!.Url = url;
-            clone!.Method = HttpMethod.Head;
-
-            return Request<byte[]>(clone);
+            return Request<byte[]>(config);
         }
 
         public Promise<Response> Options(Uri url, Config config = null)
         {
-            config ??= this.defaultConfig;
+            config = Config.BasedOn(config ?? defaultConfig);
+            config.At(url).UsingMethod(HttpMethod.Options);
 
-            var clone = config.Clone() as Config;
-            clone!.Url = url;
-            clone!.Method = HttpMethod.Options;
-
-            return Request<byte[]>(clone);
+            return Request<byte[]>(config);
         }
 
         public Promise<Response> Post(Uri url, byte[] data = null, Config config = null)
@@ -151,15 +132,12 @@ namespace KindMen.Uxios
             Config config = null
         ) where TRequestData : class
         {
-            config ??= this.defaultConfig;
+            config = Config.BasedOn(config ?? defaultConfig);
+            config.At(url).UsingMethod(HttpMethod.Post);
+            config.Data = data;
+            config.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(config);
 
-            var clone = config.Clone() as Config;
-            clone!.Url = url;
-            clone!.Method = HttpMethod.Post;
-            clone!.Data = data;
-            clone!.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(clone);
-
-            return Request<TRequestData>(clone);
+            return Request<TRequestData>(config);
         }
 
         public Promise<Response> Put(Uri url, byte[] data, Config config = null)
@@ -178,15 +156,13 @@ namespace KindMen.Uxios
             Config config = null
         ) where TRequestData : class
         {
-            config ??= this.defaultConfig;
+            config = Config.BasedOn(config ?? defaultConfig);
+            
+            config.At(url).UsingMethod(HttpMethod.Put);
+            config.Data = data;
+            config.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(config);
 
-            var clone = config.Clone() as Config;
-            clone!.Url = url;
-            clone!.Method = HttpMethod.Put;
-            clone!.Data = data;
-            clone!.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(clone);
-
-            return Request<TRequestData>(clone);
+            return Request<TRequestData>(config);
         }
 
         public Promise<Response> Patch(Uri url, byte[] data, Config config = null)
@@ -205,15 +181,14 @@ namespace KindMen.Uxios
             Config config = null
         ) where TRequestData : class
         {
-            config ??= this.defaultConfig;
+            config = Config.BasedOn(config ?? defaultConfig);
+            
+            config.At(url).UsingMethod(HttpMethod.Patch);
 
-            var clone = config.Clone() as Config;
-            clone!.Url = url;
-            clone!.Method = HttpMethod.Patch;
-            clone!.Data = data;
-            clone!.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(clone);
+            config.Data = data;
+            config.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(config);
 
-            return Request<TRequestData>(clone);
+            return Request<TRequestData>(config);
         }
 
         /// <summary>
@@ -236,11 +211,6 @@ namespace KindMen.Uxios
         public static CustomYieldInstruction WaitForRequest(IPromise request)
         {
             return new WaitUntil(() => ((Promise)request).CurState != PromiseState.Pending);
-        }
-        
-        public static TData GrabData<TData>(Response response)
-        {
-            return (TData)response.Data;
         }
     }
 }

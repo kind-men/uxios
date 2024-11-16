@@ -84,6 +84,8 @@ the features below to see how Uxios can enhance your Unity project’s networkin
     ---
     Gain control over long-running or unnecessary requests with built-in support for request cancellation. This allows you
     to optimize performance and resource use, particularly in complex applications with frequent network activity.
+    ---
+    [:material-lightning-bolt: Guide](guides/cancellation.md){ .md-button }
 
 -   #### Flexible Request and Response Customization
 

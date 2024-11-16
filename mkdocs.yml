@@ -12,6 +12,7 @@ nav:
         - 'guides/fetching-pokemon-using-get.md' 
         - 'guides/fetching-untyped-json-responses.md' 
         - 'guides/uri-templates.md' 
+        - 'guides/cancellation.md' 
         - 'guides/logging-to-the-console.md' 
         - 'guides/building-an-automatic-loader.md' 
     - 'Explanation':
