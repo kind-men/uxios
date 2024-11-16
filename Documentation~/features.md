@@ -18,14 +18,18 @@ the features below to see how Uxios can enhance your Unity project’s networkin
     ---
     Send HTTP requests with familiar `Get`, `Post`, `Put`, and `Delete` methods, inspired by popular web libraries like
     Axios, making it easy for Unity developers to integrate APIs into their projects.
+    ---
+    [:material-lightning-bolt: Guide](guides/fetching-pokemon-using-get.md){ .md-button }
 
--   #### Resource Wrapper for RESTful API's with caching
+-   #### Resource Wrapper for API's with caching
 
     ---
     Simplify API interactions with Uxios’s `Resource` wrapper, which provides built-in caching for frequently accessed
     endpoints, improving efficiency and reducing redundant network calls.
+    ---
+    [:material-lightning-bolt: Guide](guides/fetching-pokemon.md){ .md-button }
   
-- #### Automatic Request Body Serialization
+-   #### Automatic Request Body Serialization
 
     ---
     Easily send data in multiple formats, including `string`, `byte[]`, and custom objects, which are automatically
@@ -39,6 +43,15 @@ the features below to see how Uxios can enhance your Unity project’s networkin
     Specify custom data types to directly map JSON responses into Unity objects using Newtonsoft JSON.net, reducing the
     need for manual parsing and enabling seamless data handling in Unity scripts.
 
+-   #### Dynamic Templated URIs for Flexible API Endpoints
+
+    ---
+    Easily create dynamic URLs with placeholders like {id} for flexible HTTP requests. Uxios’s `TemplatedUri` allows you 
+    to specify templates that can be filled at runtime, simplifying path management for (RESTful) APIs with minimal 
+    setup.
+    ---
+    [:material-lightning-bolt: Guide](guides/uri-templates.md){ .md-button }
+
 -   #### Support for Binary, Text, Texture, and Sprite Responses
 
     ---
@@ -51,6 +64,8 @@ the features below to see how Uxios can enhance your Unity project’s networkin
     ---
     Use promises to handle async tasks, chaining actions and managing errors with ease. Built-in support for `.Then`
     and `.Catch` methods makes asynchronous workflows straightforward and keeps code clean.
+    ---
+    [:material-help-circle: Promises?](explanation/promises.md){ .md-button }
 
 -   #### Easy Support for Basic Authentication
 
@@ -87,11 +102,15 @@ the features below to see how Uxios can enhance your Unity project’s networkin
     ---
     Modify requests and responses on the fly with interceptors and transformers, allowing for custom handling like token
     authentication or data transformation before or after a request.
+    ---
+    [:material-help-circle: Interceptors?](explanation/interceptors.md){ .md-button }
 
 -   #### Complete API Integration Sample  
 
     ---
     Explore the included `Pokemon` sample, demonstrating a fully functional integration with an API, showcasing how to
     fetch data, populate UI elements, handle loading states, and manage errors—all using Uxios’s intuitive structure.
+    ---
+    [:fontawesome-brands-github: See it](https://github.com/kind-men/uxios/tree/main/Samples~/Pokemon){ .md-button }
 
 </div>
