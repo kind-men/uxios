@@ -19,6 +19,7 @@ nav:
         - 'explanation/promises.md'
         - 'explanation/interceptors.md'
     - 'Reference':
+        - 'reference/config.md'
         - 'reference/request.md'
         - 'reference/response.md'
 

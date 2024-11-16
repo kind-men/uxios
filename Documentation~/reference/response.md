@@ -1,14 +1,16 @@
 ﻿# `Response` Object
+_[:material-github: Runtime/Scripts/Response.cs](https://github.com/kind-men/uxios/blob/main/Runtime/Scripts/Response.cs)_
 
 The `Response` class in Uxios represents the result of an HTTP request, containing detailed information about the
 server's response. This includes the response data, status code, headers, and additional configuration details.
 The `Response` object allows you to easily access both the returned data and metadata about the request, making it a
 core component for handling HTTP interactions in Uxios.
 
-## Overview of the `Response` Fields and Methods
+!!! tip "You don't need to create this"
 
-The `Response` class provides several fields to capture key aspects of the server’s response. Here’s an in-depth look at
-each field and method:
+    This page serves as a reference to explain each field in the Response object. You don’t need to create or manage 
+    this object manually—it’s provided automatically as a result of a request. The Response object is useful for 
+    gaining insight into the request-response cycle, and is the object containing the returned `Data` from the server.
 
 ## Fields
 

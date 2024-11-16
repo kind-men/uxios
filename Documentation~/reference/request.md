@@ -1,14 +1,17 @@
 ﻿# `Request` Object
+_[:material-github: Runtime/Scripts/Request.cs](https://github.com/kind-men/uxios/blob/main/Runtime/Scripts/Request.cs)_
 
 The `Request` class in Uxios represents the configuration and data used to send an HTTP request. This includes the
 request URL, HTTP method, headers, query parameters, and any data being sent in the request body. The `Request` object
 is generated based on the initial configuration (`Config`), and may also be modified by interceptors and transformers
 before it is ultimately sent to the server.
 
-## Overview of the `Request` Fields and Methods
+!!! tip "You don't need to create this"
 
-The `Request` class provides several fields to capture key aspects of the request. Here’s a detailed look at each field
-and method.
+    This page serves as a reference to explain each field in the Request object. You don’t need to create or manage 
+    this object manually—it’s provided automatically in [responses](./response.md). The Request object is useful for 
+    gaining insight into the request-response cycle, such as for logging or debugging purposes, where you might want 
+    details like headers, method, or URL used in the request.
 
 ---
 
@@ -163,16 +166,12 @@ Debug.Log("Data Content-Type: " + contentType);
 
 ## Creating and Modifying a Request
 
-The `Request` object is derived from the initial `Config` settings but may be modified by **interceptors** and *
-*transformers** before it’s sent to the server. Here’s an overview of each:
+The `Request` object is derived from the initial `Config` settings but may be modified by **interceptors** before it’s 
+sent to the server. Here’s an overview:
 
 - **Interceptors**: Interceptors can inspect and modify the `Request` before it is sent or the `Response` after it’s
   received. For example, interceptors can add custom headers, update authentication tokens, or log requests for
   debugging.
-
-- **Transformers**: Transformers allow additional modifications to the request data, such as serializing complex objects
-  differently or applying compression. Transformers can add flexibility to handle unique data structures or specific
-  server requirements.
 
 ---
 

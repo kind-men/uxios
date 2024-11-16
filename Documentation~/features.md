@@ -21,7 +21,7 @@ the features below to see how Uxios can enhance your Unity project’s networkin
     ---
     [:material-lightning-bolt: Guide](guides/fetching-pokemon-using-get.md){ .md-button }
 
--   #### Resource Wrapper for API's with caching
+-   #### Resource Wrapper for API's
 
     ---
     Simplify API interactions with Uxios’s `Resource` wrapper, which provides built-in caching for frequently accessed
