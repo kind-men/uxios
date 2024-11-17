@@ -3,32 +3,36 @@ nav:
     - 'features.md'
     - 'why-use-uxios-instead-of-unitywebrequest.md'
     - 'why-axios.md'
-    - 'contributing.md'
-    - 'changelog.md'
   - 'Documentation':
     - 'getting-started.md'
     - 'Guides':
-        - "guides/index.md"
-        - 'guides/fetching-pokemon.md' 
-        - 'guides/fetching-pokemon-using-get.md' 
-        - 'guides/fetching-untyped-json-responses.md' 
-        - 'guides/uri-templates.md' 
-        - 'guides/cancellation.md' 
-        - 'guides/logging-to-the-console.md' 
-        - 'guides/building-an-automatic-loader.md'
+      - "guides/index.md"
+      - 'guides/fetching-pokemon.md' 
+      - 'guides/fetching-pokemon-using-get.md' 
+      - 'guides/fetching-untyped-json-responses.md' 
+      - 'guides/uri-templates.md' 
+      - 'guides/cancellation.md' 
+      - 'guides/logging-to-the-console.md' 
+      - 'guides/building-an-automatic-loader.md'
     - 'Bytesized':
       - "guides/bytesized/index.md"
       - "Resource":
-          - "guides/bytesized/resource/fetching.md"
-          - "guides/bytesized/resource/authentication.md"
+        - "guides/bytesized/resource/fetching.md"
+        - "guides/bytesized/resource/authentication.md"
     - 'Explanation':
-        - 'explanation/promises.md'
-        - 'explanation/interceptors.md'
+      - 'explanation/promises.md'
+      - 'explanation/interceptors.md'
     - 'Reference':
-        - 'reference/config.md'
-        - 'reference/request.md'
-        - 'reference/response.md'
-        - 'reference/error.md'
+      - 'reference/config.md'
+      - 'reference/request.md'
+      - 'reference/response.md'
+      - 'reference/error.md'
+  - 'Community':
+    - 'getting-support.md'
+    - 'reporting-bugs.md'
+    - 'contributing.md'
+    - 'changelog.md'
+      
 
 # Includes, starting with an underscore - https://www.mkdocs.org/user-guide/configuration/#not_in_nav
 not_in_nav: |
