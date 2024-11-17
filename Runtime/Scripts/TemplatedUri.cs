@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using UriParameters = KindMen.Uxios.Http.QueryParameters;
 
 namespace KindMen.Uxios
@@ -49,26 +50,35 @@ namespace KindMen.Uxios
 
         private Uri Resolve()
         {
-            UriBuilder uriBuilder = new UriBuilder(uri);
-            string pathAndQuery = uri.PathAndQuery
+            var uriTemplateParts = GetUriTemplateParts();
+            if (uriTemplateParts.Count == 0) return uri;
+
+            var pathAndQueryBuilder = new StringBuilder(uri.PathAndQuery);
+
+            pathAndQueryBuilder
                 .Replace("%7B", "{")
                 .Replace("%7D", "}");
 
-            foreach (var uriTemplatePart in GetUriTemplateParts())
+            foreach (var uriTemplatePart in uriTemplateParts)
             {
                 var replacement = parameters.Consume(uriTemplatePart);
                 if (replacement == null) continue;
 
-                pathAndQuery = pathAndQuery.Replace(
+                pathAndQueryBuilder.Replace(
                     $"{{{uriTemplatePart}}}",
                     QueryString.Escape(replacement)
                 );
             }
 
-            var pathAndQueryArray = pathAndQuery.Split('?');
-            uriBuilder.Path = pathAndQueryArray[0];
-            uriBuilder.Query = pathAndQueryArray.Length > 1 ? pathAndQueryArray[1] : "";
-            
+            var pathAndQuery = pathAndQueryBuilder.ToString();
+            int queryIndex = pathAndQuery.IndexOf('?');
+
+            UriBuilder uriBuilder = new UriBuilder(uri)
+            {
+                Path = queryIndex >= 0 ? pathAndQuery.Substring(0, queryIndex) : pathAndQuery,
+                Query = queryIndex >= 0 ? pathAndQuery.Substring(queryIndex + 1) : string.Empty
+            };
+
             return uriBuilder.Uri;
         }
 
@@ -111,7 +121,12 @@ namespace KindMen.Uxios
 
             return parameterNames;
         }
-    
+
+        public Uri Uri()
+        {
+            return Resolve();
+        }
+
         public override string ToString()
         {
             return Resolve().ToString();
@@ -119,7 +134,7 @@ namespace KindMen.Uxios
 
         public static implicit operator TemplatedUri(string uriString) => new(uriString);
 
-        public static implicit operator Uri(TemplatedUri customUri) => customUri.Resolve();
+        public static implicit operator Uri(TemplatedUri customUri) => customUri.Uri();
 
         public static implicit operator string(TemplatedUri customUri) => customUri.ToString();
     }

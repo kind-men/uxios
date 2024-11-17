@@ -45,6 +45,10 @@ namespace KindMen.Uxios.Tests
         [Test]
         public void ReplacesTemplatePartsWithQueryParametersAddedLater()
         {
+            // TODO: this test fails because parameters is newly created in the With function - and thus the original
+            // was not modified. This is interesting because on the one hand we want to consume values, but on the other
+            // hand UriTemplate should be used as a template and the With method should not alter a templated version
+            // of parameters.. I need to think some more on what direction to take this
             var parameters = new QueryParameters {{"userId", "123"}};
             var templatedUri = new TemplatedUri("https://example.com/users/{userId}/posts/{postId}", parameters);
             
@@ -53,9 +57,10 @@ namespace KindMen.Uxios.Tests
             
             var resolvedUri = appendedUri.ToString();
 
+            Assert.AreEqual("https://example.com/users/123/posts/456", resolvedUri);
+
             // The used parameters should be removed as they are 'consumed'
             Assert.That(parameters, Is.Empty);
-            Assert.AreEqual("https://example.com/users/123/posts/456", resolvedUri);
         }
 
         [Test]
