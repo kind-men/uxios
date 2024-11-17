@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for Templated URI's, you can prepare a templated URI that will resolve with given parameters
 - Full support for cancellation sources/tokens
 - Support for authentication in the Resource class using the 'As' method
+- Support for multiple Transports based on scheme - this is an experimental feature to verify whether it is possible
+  to load files from various locations based on the scheme
 
 ### Changed
 

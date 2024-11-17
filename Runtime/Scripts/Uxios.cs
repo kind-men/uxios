@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using KindMen.Uxios.Interceptors;
 using KindMen.Uxios.Transports;
@@ -17,6 +18,12 @@ namespace KindMen.Uxios
         private readonly Config defaultConfig;
         private readonly ExpectedTypeOfResponseResolver expectedTypeOfResponseResolver;
 
+        /// <summary>
+        /// Dictionary of a scheme => transport combination to determine which transport will handle
+        /// a request based on the scheme of the url. 
+        /// </summary>
+        private Dictionary<string, IUxiosTransport> transports = new();
+        
         /// <summary>
         /// Although it is recommended to inject an Uxios instance where you need it, you can also access a global
         /// DefaultInstance. This is mostly used internally by the Resource and Collection object proxies, but if needed
@@ -41,20 +48,31 @@ namespace KindMen.Uxios
             ExpectedTypeOfResponseResolver expectedTypeOfResponseResolver = null
         ) {
             this.defaultConfig = config;
-            this.uxiosTransport = transport ?? UnityWebRequestTransport.Instance();
             this.expectedTypeOfResponseResolver = expectedTypeOfResponseResolver ?? new ExpectedTypeOfResponseResolver();
+
+            RegisterTransport(transport ?? UnityWebRequestTransport.Instance());
 
             // Load default Interceptors; we may add more later
             var jsonConverter = new JsonConverter();
             Interceptors.response.Add(new ResponseInterceptor(jsonConverter.OnResponseSuccess), jsonConverter.Priority);
         }
 
+        public void RegisterTransport(IUxiosTransport transport)
+        {
+            foreach (var scheme in transport.SupportedSchemes)
+            {
+                transports.Add(scheme, transport);
+            }
+        }
+
         private Promise<Response> Request<TData>(Config config) where TData : class
         {
             // When the user or none of the other methods set a response type, grab the default one from the resolver
-            config.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve(config); 
+            config.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve(config);
 
-            return uxiosTransport.PerformRequest<TData>(config);
+            var scheme = config.Url.IsAbsoluteUri ? config.Url.Scheme : config.BaseUrl.Scheme;
+            
+            return transports[scheme].PerformRequest<TData>(config);
         }
 
         public Promise<Response> Get(Uri url, Config config = null)

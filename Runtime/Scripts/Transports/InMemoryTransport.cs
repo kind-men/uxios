@@ -12,6 +12,8 @@ namespace KindMen.Uxios.Transports
 
         public List<Response> Transactions => transactions;
 
+        public string[] SupportedSchemes => new[] { "memory" };
+
         public static InMemoryTransport Instance()
         {
             if (inMemoryTransport != null) return inMemoryTransport;

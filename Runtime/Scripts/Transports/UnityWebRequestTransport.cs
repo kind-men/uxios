@@ -13,6 +13,8 @@ namespace KindMen.Uxios.Transports
     {
         private static UnityWebRequestTransport unityWebRequestTransport;
 
+        public string[] SupportedSchemes => new[] { "http", "https", "file" };
+
         public static UnityWebRequestTransport Instance()
         {
             if (unityWebRequestTransport != null) return unityWebRequestTransport;

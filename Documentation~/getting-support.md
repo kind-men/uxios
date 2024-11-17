@@ -6,7 +6,7 @@ interaction. Here’s how to make the most of the support options available.
 
 ---
 
-### Where to Go for Help
+## Where to Go for Help
 
 Our GitHub Discussions section is open for:
 
@@ -15,13 +15,13 @@ Our GitHub Discussions section is open for:
 - **Show and Tell**: Share your projects! We’d love to know how Uxios is making your development process easier.
 - **Open Discussions**: Join broader conversations, explore best practices, and interact with the Uxios community.
 
-### Using GitHub Issues for Bug Reports Only
+## Using GitHub Issues for Bug Reports Only
 
 To streamline our support efforts, please use **GitHub Issues** exclusively for bug reports. This separation helps the
 maintainer focus on bug fixes without sifting through general discussions. You can refer to
 our [Submitting a Bug Report](reporting-bugs.md) page for more details on reporting bugs.
 
-### Why Use Discussions?
+## Why Use Discussions?
 
 Our GitHub Discussions create a central place for all Uxios-related topics, allowing everyone to:
 
@@ -29,7 +29,7 @@ Our GitHub Discussions create a central place for all Uxios-related topics, allo
 - Collaborate on features and improvements.
 - Showcase unique projects and creative uses of Uxios.
 
-### Getting Started
+## Getting Started
 
 - Visit the [GitHub Discussions page](https://github.com/kind-men/uxios/discussions).
 - Browse or search for similar questions or topics.
