@@ -13,6 +13,7 @@
     color: #DC81CA;
     padding-bottom: 1.25rem;
     border-bottom: 1px solid #e0e0e0;
+    letter-spacing: .5px;
 }
 
 /*****************************************************************************/
@@ -109,6 +110,11 @@
 .two-column {
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.two-column > div {
+    flex: 0 0 calc(50% - 2rem);
 }
 
 .two-column + .two-column {
