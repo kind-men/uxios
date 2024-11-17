@@ -98,6 +98,8 @@ the features below to see how Uxios can enhance your Unity project’s networkin
     ---
     Catch and handle errors at each step in the request process, ensuring that your app provides clear feedback and robust
     error messaging without additional complexity.
+    ---
+    [:material-book-education: Errors](reference/error.md){ .md-button }
 
 -   #### Interceptor and Transformer Support
 

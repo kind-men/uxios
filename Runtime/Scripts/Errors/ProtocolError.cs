@@ -7,7 +7,7 @@ namespace KindMen.Uxios.Errors
     {
         public HttpStatusCode Status => Response.Status;
 
-        public ProtocolError(string message, Config request, Response response, Exception e) : base(message, request, response, e)
+        public ProtocolError(string message, Config config, Response response, Exception e) : base(message, config, response, e)
         {
         }
     }

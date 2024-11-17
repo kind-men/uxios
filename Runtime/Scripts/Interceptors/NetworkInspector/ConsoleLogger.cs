@@ -18,7 +18,7 @@ namespace KindMen.Uxios.Interceptors.NetworkInspector
         {
             var data = JsonConvert.SerializeObject(error, Formatting.Indented);
 
-            Debug.LogError($"[UXIOS] Error occurred during request to {error.Request.Url}: \n\n{data}");
+            Debug.LogError($"[UXIOS] Error occurred during request to {error.Config.Url}: \n\n{data}");
 
             return error;
         }

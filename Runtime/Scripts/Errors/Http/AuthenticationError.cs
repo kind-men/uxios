@@ -8,7 +8,7 @@ namespace KindMen.Uxios.Errors.Http
     /// </summary>
     public abstract class AuthenticationError : HttpClientError
     {
-        protected AuthenticationError(string message, Config request, Response response, Exception e) : base(message, request, response, e)
+        protected AuthenticationError(string message, Config config, Response response, Exception e) : base(message, config, response, e)
         {
         }
     }

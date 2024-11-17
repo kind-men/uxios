@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ForbiddenError when an authenticated user is not allowed to access the resource (HTTP 403)
 - Support for Templated URI's, you can prepare a templated URI that will resolve with given parameters
 - Full support for cancellation sources/tokens
+- Support for authentication in the Resource class using the 'As' method
 
 ### Changed
 
@@ -24,6 +25,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   change will make interceptors instance specific and copy an initial set from the default instance; similar 
   to `axios.create()`
 - Config is no longer cloneable - a new static method has been introduced that creates a new Config based on another
+- TemplatedUri's Resolve method is more optimized to reduce garbage generation
+- The "request" field and arguments in the Error classes has been renamed to "config" to better explain the difference
+  between request objects and config objects
+- Adding a new query parameter to a Resource class using the `With` method has its signature changed from 
+  `KeyValuePair<string, string>` to the arguments `string`,`string` to simplify the API.
 
 ### Fixed
 

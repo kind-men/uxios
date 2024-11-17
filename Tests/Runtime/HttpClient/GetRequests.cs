@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using KindMen.Uxios.Errors;
@@ -8,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using QueryParameters = KindMen.Uxios.Http.QueryParameters;
 
 namespace KindMen.Uxios.Tests.HttpClient
 {
@@ -351,9 +354,6 @@ namespace KindMen.Uxios.Tests.HttpClient
                 promise,
                 exception =>
                 {
-                    Debug.Log(exception);
-                    Debug.Log(exception.Message);
-                    Debug.Log(exception.GetType().ToString());
                     var response = (exception as Error).Response;
                     Assert.That(response, Is.Not.Null);
                     HttpAssertions.AssertStatusCode(response, HttpStatusCode.Unauthorized);
@@ -361,6 +361,90 @@ namespace KindMen.Uxios.Tests.HttpClient
                     Assert.That(response.Data, Is.Empty);
                 }
             );
+        }
+
+                [UnityTest]
+        public IEnumerator GetCollectionOfResources()
+        {
+            var url = new Uri("https://jsonplaceholder.typicode.com/posts");
+
+            var promise = uxios.Get<List<ExamplePost>>(url);
+            
+            yield return PromiseAssertions.AssertPromiseSucceeds(
+                promise, 
+                response =>
+                {
+                    var posts = AssertReceivedCollectionOfPosts(response, 100);
+
+                    AssertCanonicalPost(posts.First());
+                }
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator GetsFilteredCollectionOfResources()
+        {
+            var url = new Uri("https://jsonplaceholder.typicode.com/posts");
+
+            var promise = uxios.Get<List<ExamplePost>>(url, new QueryParameters{ { "userId", "1" } });
+
+            yield return PromiseAssertions.AssertPromiseSucceeds(
+                promise, 
+                response =>
+                {
+                    var posts = AssertReceivedCollectionOfPosts(response, 10);
+
+                    AssertCanonicalPost(posts.First());
+                }
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator GetsFilteredCollectionOfResourcesUsingQueryParametersInTheUrl()
+        {
+            var url = new Uri("https://jsonplaceholder.typicode.com/posts?userId=1");
+
+            var promise = uxios.Get<List<ExamplePost>>(url);
+
+            yield return PromiseAssertions.AssertPromiseSucceeds(
+                promise, 
+                response =>
+                {
+                    var posts = AssertReceivedCollectionOfPosts(response, 10);
+
+                    AssertCanonicalPost(posts.First());
+                }
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator GetsFilteredCollectionOfResourcesUsingParametersInTheConfig()
+        {
+            var url = new Uri("https://jsonplaceholder.typicode.com/posts");
+
+            var queryParameters = new QueryParameters() { { "userId", "1" } };
+            var config = new Config { Params = queryParameters };
+            var promise = uxios.Get<List<ExamplePost>>(url, config);
+            
+            yield return PromiseAssertions.AssertPromiseSucceeds(
+                promise, 
+                response =>
+                {
+                    var posts = AssertReceivedCollectionOfPosts(response, 10);
+                    AssertCanonicalPost(posts.First());
+                }
+            );
+        }
+
+        private static List<ExamplePost> AssertReceivedCollectionOfPosts(Response response, int numberOfResults)
+        {
+            Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.Data, Is.TypeOf<List<ExamplePost>>());
+            List<ExamplePost> posts = response.Data as List<ExamplePost>;
+            Assert.That(posts, Is.Not.Null);
+            Assert.That(posts, Has.Count.EqualTo(numberOfResults));
+        
+            return posts;
         }
 
         private void AssertExampleHtmlWasReceived(Response response)

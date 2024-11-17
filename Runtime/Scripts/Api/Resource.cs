@@ -49,11 +49,11 @@ namespace KindMen.Uxios.Api
         /// <summary>
         /// When it is time, get the resource with the given query parameter in addition to other defined ones.
         /// </summary>
-        public Resource<TResponse> With(KeyValuePair<string, string> parameter)
+        public Resource<TResponse> With(string key, string value)
         {
             // Changing these parameters will make the cache invalid
             InvalidateCache();
-            config.Params.Add(parameter.Key, parameter.Value);
+            config.Params.Add(key, value);
 
             return this;
         }
@@ -66,6 +66,24 @@ namespace KindMen.Uxios.Api
             // Changing these parameters will make the cache invalid
             InvalidateCache();
             config.Data = data;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Perform this request 'as' the user with the given username and password.
+        /// </summary>
+        public Resource<TResponse> As(string username, string password)
+        {
+            return As(new BasicAuthenticationCredentials(username, password));
+        }
+
+        /// <summary>
+        /// Perform this request 'as' the user with the given credentials.
+        /// </summary>
+        public Resource<TResponse> As(Credentials credentials)
+        {
+            config.Auth = credentials;
 
             return this;
         }
