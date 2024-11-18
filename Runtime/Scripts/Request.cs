@@ -104,9 +104,9 @@ namespace KindMen.Uxios
         private static (string contentType, byte[] bytes) ConvertToByteArray<T>(object data) where T : class
         {
             T dataToSend = data as T;
-            if (data == null)
+            if (dataToSend == null)
             {
-                return (null, null);
+                return ("application/octet-stream", new byte[]{});
             }
             
             switch (dataToSend)

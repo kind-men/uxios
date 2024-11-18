@@ -17,12 +17,12 @@ namespace KindMen.Uxios.Transports
         {
             Config = config;
             Status = (HttpStatusCode)webRequest.responseCode;
-            Headers = new Headers(webRequest.GetResponseHeaders());
+            Headers = new Headers(webRequest.GetResponseHeaders() ?? new ());
             Request = uxiosRequest;
             UnityWebRequest = webRequest;
-            Data = (UnityWebRequest.downloadHandler is not DownloadHandlerFile) 
+            Data = UnityWebRequest.downloadHandler is not DownloadHandlerFile 
                 ? UnityWebRequest.downloadHandler.data // Default to the raw byte[] representation 
-                : null; // unless the DownloadHandler does not support this
+                : new byte[]{}; // unless the DownloadHandler does not support this
             
             // TODO: Move this higher up in the chain as a post-step to prevent exceptions here from
             // preventing the instantiation of request

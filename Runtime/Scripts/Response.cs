@@ -6,7 +6,7 @@ namespace KindMen.Uxios
     /// <summary>
     /// Represents the response of an HTTP request in Uxios.
     /// </summary>
-    public abstract class Response
+    public class Response
     {
         /// <summary>
         /// Gets the HTTP status code returned by the server.
@@ -18,7 +18,7 @@ namespace KindMen.Uxios
         /// Gets the headers returned in the response.
         /// Contains key-value pairs representing HTTP headers, such as "Content-Type" or "Authorization".
         /// </summary>
-        public Headers Headers;
+        public Headers Headers = new();
 
         /// <summary>
         /// Gets the original request that initiated this response.
@@ -37,7 +37,7 @@ namespace KindMen.Uxios
         /// This is the deserialized content of the response, typically the class you provided, and its type varies
         /// based on the request configuration.
         /// </summary>
-        public object Data;
+        public object Data = new byte[] { };
 
         /// <summary>
         /// Validates the response status using the validation function defined in the configuration.

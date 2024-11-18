@@ -51,6 +51,7 @@ namespace KindMen.Uxios
             this.expectedTypeOfResponseResolver = expectedTypeOfResponseResolver ?? new ExpectedTypeOfResponseResolver();
 
             RegisterTransport(transport ?? UnityWebRequestTransport.Instance());
+            RegisterTransport(UnityPersistentDataTransport.Instance());
 
             // Load default Interceptors; we may add more later
             var jsonConverter = new JsonConverter();

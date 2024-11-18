@@ -12,6 +12,7 @@ nav:
       - 'guides/fetching-untyped-json-responses.md' 
       - 'guides/uri-templates.md' 
       - 'guides/cancellation.md' 
+      - 'guides/working-with-persistent-data.md' 
       - 'guides/logging-to-the-console.md' 
       - 'guides/building-an-automatic-loader.md'
     - 'Bytesized':

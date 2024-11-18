@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for authentication in the Resource class using the 'As' method
 - Support for multiple Transports based on scheme - this is an experimental feature to verify whether it is possible
   to load files from various locations based on the scheme
+- `unity+persistent` scheme that allows for files to be loaded and stored to and from the persistentDataPath in Unity,
+  even on WebGL
 
 ### Changed
 
@@ -37,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Errors generated as part of a response were created as a generic error instead of a specific error
 - Bug where an empty response in an error would throw an "Invalid Cast" issue and blocking error handling
+- Various edge cases that would -or could- result in a null-value exception
 
 ## [0.1.3] - 2024-11-13
 

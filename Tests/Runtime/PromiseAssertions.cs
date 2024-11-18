@@ -18,6 +18,7 @@ namespace KindMen.Uxios.Tests
                 {
                     var errorMessage = "An error should not have occurred, received: " + e.Message;
                     errorMessage += "\n" + JsonConvert.SerializeObject((e as Error)?.Response, Formatting.Indented);
+                    errorMessage += "\n StackTrace: " + e.InnerException.StackTrace;
 
                     Assert.Fail(errorMessage);
                 });
