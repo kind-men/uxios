@@ -1,13 +1,13 @@
 {
   "name": "com.kind-men.uxios",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "displayName": "Uxios",
   "description": "A Unity-native, Axios-inspired HTTP client for streamlined, typed, and extensible networking across platforms.",
   "unity": "2022.3",
-  "documentationUrl": "https://kind-men.github.io/uxios/",
-  "changelogUrl": "https://github.com/kind-men/uxios/blob/main/CHANGELOG.md",
+  "documentationUrl": "https://kind-men.github.io/uxios/getting-started/",
+  "changelogUrl": "https://kind-men.github.io/uxios/changelog/",
   "licensesUrl": "https://github.com/kind-men/uxios/blob/main/LICENSE",
-  "keywords": ["httpclient", "axios", "kindmen", "unitypackage", "junison"],
+  "keywords": ["httpclient", "axios", "kindmen", "unitypackage", "junison", "uxios", "webgl"],
   "author": {
     "name": "Kind Men",
     "email": "mike@kind-men.com",
