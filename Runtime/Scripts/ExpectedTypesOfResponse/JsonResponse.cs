@@ -1,4 +1,5 @@
 ﻿using System;
+using KindMen.Uxios.Http;
 using Newtonsoft.Json;
 
 namespace KindMen.Uxios.ExpectedTypesOfResponse
@@ -17,7 +18,7 @@ namespace KindMen.Uxios.ExpectedTypesOfResponse
         
         public override void AddMetadataToRequest(Request request)
         {
-            request.Headers.TryAdd("Accept", OfResourceType);
+            request.Headers.TryAdd(Headers.Accept, OfResourceType);
         }
     }
 }

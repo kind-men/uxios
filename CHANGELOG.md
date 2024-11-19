@@ -5,6 +5,15 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- An uxios-specific User Agent string is now set by default instead of relying on the transport providing a user agent
+- The Headers collection now features a basic series of constants describing headers that are added
+- A Request Id is now available with Request objects, an internal id is used unless the user provides a header 
+  X-Request-Id, in which case that will also internally be used as id for the request.
+
 ## [0.2.0] - 2024-11-18
 
 ### Added

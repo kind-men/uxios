@@ -31,8 +31,10 @@ nav:
   - 'Community':
     - 'getting-support.md'
     - 'reporting-bugs.md'
-    - 'contributing.md'
     - 'changelog.md'
+    - 'contributing.md'
+    - 'Contributors':
+        - 'community/release-process.md'
       
 
 # Includes, starting with an underscore - https://www.mkdocs.org/user-guide/configuration/#not_in_nav

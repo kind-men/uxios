@@ -1,4 +1,4 @@
-﻿using System;
+﻿using KindMen.Uxios.Http;
 
 namespace KindMen.Uxios.ExpectedTypesOfResponse
 {
@@ -6,7 +6,7 @@ namespace KindMen.Uxios.ExpectedTypesOfResponse
     {
         public override void AddMetadataToRequest(Request request)
         {
-            request.Headers.TryAdd("Accept", "application/octet-stream");
+            request.Headers.TryAdd(Headers.Accept, "application/octet-stream");
         }
     }
 }

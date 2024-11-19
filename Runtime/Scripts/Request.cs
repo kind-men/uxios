@@ -13,6 +13,31 @@ namespace KindMen.Uxios
     /// </summary>
     public class Request
     {
+        private readonly string id = Guid.NewGuid().ToString();
+
+        /// <summary>
+        /// The Request Id helps to correlate requests and responses.
+        ///
+        /// This is especially useful in logging and tracing where you want to group (correlate) requests together
+        /// with responses or errors. Since the request object is always part of an error or response, the Id can be
+        /// take from there.
+        ///
+        /// By default, we use a GUID when constructing an id, unless the X-Request-Id header is provided, this header
+        /// supercedes internally constructed id's because some servers interpret this.
+        ///
+        /// The opposite is explicitly not the case - Uxios doesn't automatically add the X-Request-Id header because
+        /// that breaks some request when [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) is in effect.
+        /// </summary>
+        [JsonProperty] public string Id
+        {
+            get
+            {
+                Headers.TryGetValue(Headers.RequestId, out var requestId);
+
+                return string.IsNullOrEmpty(requestId) == false ? requestId : this.id;
+            }
+        }
+
         /// <summary>
         /// The full URI for the request, including base URL and endpoint.
         /// The URL may be modified by interceptors.
@@ -29,7 +54,10 @@ namespace KindMen.Uxios
         /// A collection of HTTP headers included in the request, stored as key-value pairs.
         /// Headers provide additional information such as authorization, content type, etc.
         /// </summary>
-        public Headers Headers = new();
+        public Headers Headers = new()
+        {
+            { Headers.UserAgent, $"uxios/{Uxios.Version}" }
+        };
         
         /// <summary>
         /// The query parameters for the request, represented as a collection of key-value pairs.
@@ -57,7 +85,11 @@ namespace KindMen.Uxios
             var request = new Request();
 
             // Make URI an absolute Uri for easy handling
-            var urlBuilder = new UriBuilder(!config.Url.IsAbsoluteUri ? new Uri(config.BaseUrl, config.Url) : config.Url);
+            var urlBuilder = new UriBuilder(
+                config.Url.IsAbsoluteUri == false 
+                    ? new Uri(config.BaseUrl, config.Url) 
+                    : config.Url
+            );
             
             // Move any query parameters from the URL to the QueryString collection ...
             request.QueryString = new QueryParameters(
@@ -76,7 +108,7 @@ namespace KindMen.Uxios
             switch (config.Auth)
             {
                 case ICredentialsUsingAuthorizationToken credentials:
-                    request.Headers.TryAdd("Authorization", credentials.ToAuthorizationToken());
+                    request.Headers.TryAdd(Headers.Authorization, credentials.ToAuthorizationToken());
                     break;
                 case ICredentialsUsingQueryString queryStringCredentials:
                     request.QueryString.Add(queryStringCredentials.ToQueryStringSegments());
@@ -87,7 +119,7 @@ namespace KindMen.Uxios
             var (contentType, bytes) = ConvertToByteArray<TData>(config.Data);
             if (string.IsNullOrEmpty(contentType) == false)
             {
-                request.Headers.TryAdd("Content-Type", contentType);
+                request.Headers.TryAdd(Headers.ContentType, contentType);
             }
             request.Data = bytes;
             

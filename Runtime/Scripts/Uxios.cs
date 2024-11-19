@@ -11,6 +11,8 @@ namespace KindMen.Uxios
 {
     public sealed class Uxios
     {
+        public const string Version = "0.2.1";
+
         private static Uxios defaultInstance;
         public Interceptors.Interceptors Interceptors { get; } = new();
 
