@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
 using KindMen.Uxios.Interceptors;
@@ -214,7 +215,7 @@ namespace KindMen.Uxios
 
         /// <summary>
         /// Sometimes you want a blocking flow inside a coroutine, this method will help to wait for the completion of a
-        /// promise inside a CoRoutine. Do mind, this is not a recommended practice as promises are more than capable of
+        /// promise inside a Coroutine. Do mind, this is not a recommended practice as promises are more than capable of
         /// running their own course.
         ///
         /// The main function of this is when you depend on other libraries to do stuff after the request completed, or
@@ -232,6 +233,26 @@ namespace KindMen.Uxios
         public static CustomYieldInstruction WaitForRequest(IPromise request)
         {
             return new WaitUntil(() => ((Promise)request).CurState != PromiseState.Pending);
+        }
+        
+        /// <summary>
+        /// Sometimes, external libraries do not know how to work with promises and just need an IEnumerator, so we
+        /// provide a convenience method to wrap a promise inside a method that can be started as a Coroutine (or
+        /// yielded when needed inside another).
+        ///
+        /// This is not a replacement for using the Then, Catch and Finally method 
+        /// </summary>
+        /// <param name="promise"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        private static IEnumerator AsCoroutine<T>(Promise<T> promise)
+        {
+            yield return WaitForRequest(promise);
+        }
+        
+        private static IEnumerator AsCoroutine(IPromise promise)
+        {
+            yield return WaitForRequest(promise);
         }
     }
 }

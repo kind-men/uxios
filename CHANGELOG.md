@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The Headers collection now features a basic series of constants describing headers that are added
 - A Request Id is now available with Request objects, an internal id is used unless the user provides a header 
   X-Request-Id, in which case that will also internally be used as id for the request.
+- `Uxios.AsCoroutine` - a wrapper around a promise that will allow it to be used in situations where you just _must_ 
+  have a coroutine. _Don't use this when you don't need to, some libraries require coroutines_.
 
 ## [0.2.0] - 2024-11-18
 
