@@ -17,12 +17,15 @@ nav:
       - 'guides/building-an-automatic-loader.md'
     - 'Bytesized':
       - "guides/bytesized/index.md"
+      - "guides/bytesized/wrapping-promises-as-coroutines.md"
+      - "guides/bytesized/waiting-for-promises-inside-coroutines.md"
       - "Resource":
         - "guides/bytesized/resource/fetching.md"
         - "guides/bytesized/resource/authentication.md"
     - 'Explanation':
       - 'explanation/promises.md'
       - 'explanation/interceptors.md'
+      - 'explanation/coroutines.md'
     - 'Reference':
       - 'reference/config.md'
       - 'reference/request.md'
