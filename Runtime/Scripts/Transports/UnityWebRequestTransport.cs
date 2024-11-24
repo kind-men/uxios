@@ -2,6 +2,7 @@
 using System.Collections;
 using KindMen.Uxios.Errors;
 using KindMen.Uxios.ExpectedTypesOfResponse;
+using KindMen.Uxios.Transports.Unity;
 using RSG;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -96,14 +97,8 @@ namespace KindMen.Uxios.Transports
             // thus: no timeout
             webRequest.timeout = Mathf.CeilToInt(config.Timeout * 0.001f);
             webRequest.redirectLimit = config.MaxRedirects;
-            webRequest.downloadHandler = config.TypeOfResponseType switch
-            {
-                TextureResponse responseType => new DownloadHandlerTexture(responseType.Readable),
-                FileResponse responseType => new DownloadHandlerFile(responseType.Path),
-                SpriteResponse responseType => new DownloadHandlerTexture(responseType.Readable),
-                _ => new DownloadHandlerBuffer()
-            };
-            webRequest.uploadHandler = new UploadHandlerRaw(uxiosRequest.Data ?? new byte[]{});
+            webRequest.downloadHandler = HandlerFactory.DownloadHandler(config.TypeOfResponseType);
+            webRequest.uploadHandler = HandlerFactory.UploadHandler(uxiosRequest);
 
             foreach (var header in uxiosRequest.Headers)
             {

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using KindMen.Uxios.Errors;
 using KindMen.Uxios.ExpectedTypesOfResponse;
+using KindMen.Uxios.Transports.Unity;
 using RSG;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -148,14 +149,8 @@ namespace KindMen.Uxios.Transports
             // Directly use the Path - this will work cross platform
             var webRequest = new UnityWebRequest(path, uxiosRequest.Method.ToString());
 
-            webRequest.downloadHandler = config.TypeOfResponseType switch
-            {
-                TextureResponse responseType => new DownloadHandlerTexture(responseType.Readable),
-                FileResponse responseType => new DownloadHandlerFile(responseType.Path),
-                SpriteResponse responseType => new DownloadHandlerTexture(responseType.Readable),
-                _ => new DownloadHandlerBuffer()
-            };
-            webRequest.uploadHandler = new UploadHandlerRaw(uxiosRequest.Data ?? new byte[] { });
+            webRequest.downloadHandler = HandlerFactory.DownloadHandler(config.TypeOfResponseType);
+            webRequest.uploadHandler = HandlerFactory.UploadHandler(uxiosRequest);
 
             return webRequest;
         }
