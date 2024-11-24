@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using KindMen.Uxios.Errors;
-using KindMen.Uxios.ExpectedTypesOfResponse;
 using KindMen.Uxios.Transports.Unity;
 using RSG;
 using UnityEngine;
@@ -81,7 +80,7 @@ namespace KindMen.Uxios.Transports
                 request.result switch
                 {
                     UnityWebRequest.Result.DataProcessingError => new DataProcessingError(request.error, config, null),
-                    _ => new ConnectionError(request.error, config, null)
+                    _ => ConnectionError.FromString(request.error, config)
                 }
             );
         }

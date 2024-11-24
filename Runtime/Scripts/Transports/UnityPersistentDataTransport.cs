@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using KindMen.Uxios.Errors;
-using KindMen.Uxios.ExpectedTypesOfResponse;
 using KindMen.Uxios.Transports.Unity;
 using RSG;
 using UnityEngine;
@@ -64,8 +63,7 @@ namespace KindMen.Uxios.Transports
                     new ConnectionError(
                         "No file path was provided when using the scheme 'unity+persistent', please check if " 
                         + "there are 3 slashes after the scheme instead of 2", 
-                        config, 
-                        null
+                        config
                     )
                 );
 
@@ -139,7 +137,7 @@ namespace KindMen.Uxios.Transports
                 request.result switch
                 {
                     UnityWebRequest.Result.DataProcessingError => new DataProcessingError(request.error, config, null),
-                    _ => new ConnectionError(request.error, config, null)
+                    _ => new ConnectionError(request.error, config)
                 }
             );
         }
