@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using KindMen.Uxios.Interceptors;
 using KindMen.Uxios.Transports;
 using RSG;
@@ -26,7 +27,9 @@ namespace KindMen.Uxios
         /// a request based on the scheme of the url. 
         /// </summary>
         private Dictionary<string, IUxiosTransport> transports = new();
-        
+
+        private readonly AbortController abortController;
+
         /// <summary>
         /// Although it is recommended to inject an Uxios instance where you need it, you can also access a global
         /// DefaultInstance. This is mostly used internally by the Resource and Collection object proxies, but if needed
@@ -48,10 +51,12 @@ namespace KindMen.Uxios
         public Uxios(
             Config config,
             IUxiosTransport transport = null, 
-            ExpectedTypeOfResponseResolver expectedTypeOfResponseResolver = null
+            ExpectedTypeOfResponseResolver expectedTypeOfResponseResolver = null,
+            AbortController abortController = null
         ) {
             this.defaultConfig = config;
             this.expectedTypeOfResponseResolver = expectedTypeOfResponseResolver ?? new ExpectedTypeOfResponseResolver();
+            this.abortController = abortController ? abortController : AbortController.Instance();
 
             RegisterTransport(transport ?? UnityWebRequestTransport.Instance());
             RegisterTransport(UnityPersistentDataTransport.Instance());
@@ -75,8 +80,19 @@ namespace KindMen.Uxios
             config.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve(config);
 
             var scheme = config.Url.IsAbsoluteUri ? config.Url.Scheme : config.BaseUrl.Scheme;
+
+            // Ensure a request is cancellable
+            var cancellationTokenSource = new CancellationTokenSource();
+            config.CancelUsing(cancellationTokenSource);
             
-            return transports[scheme].PerformRequest<TData>(config);
+            // Initiate the request on the transport - and thus obtain the promise
+            var promise = transports[scheme].PerformRequest<TData>(config);
+            
+            // Provide the setup and deinitializiation on the abort controller
+            abortController.Register(promise, cancellationTokenSource);
+            promise.Finally(() => abortController.Unregister(promise));
+            
+            return promise;
         }
 
         public Promise<Response> Get(Uri url, Config config = null)
@@ -213,6 +229,11 @@ namespace KindMen.Uxios
             return Request<TRequestData>(config);
         }
 
+        public void Abort(IPromiseInfo promise)
+        {
+            abortController.Abort(promise);
+        }
+        
         /// <summary>
         /// Sometimes you want a blocking flow inside a coroutine, this method will help to wait for the completion of a
         /// promise inside a Coroutine. Do mind, this is not a recommended practice as promises are more than capable of
@@ -225,14 +246,32 @@ namespace KindMen.Uxios
         /// </summary>
         /// <param name="request">The promise to wait for</param>
         /// <returns>Custom yield instruction - this method can be as as part of a `yield return` clause</returns>
-        public static CustomYieldInstruction WaitForRequest<TResponse>(Promise<TResponse> request)
+        public static CustomYieldInstruction WaitForRequest<TResponse>(IPromise<TResponse> request)
         {
-            return new WaitUntil(() => request.CurState != PromiseState.Pending);
+            var promise = request as Promise<TResponse>;
+            
+            return new WaitUntil(() =>
+            {
+                // Signal to the abort controller that the Promise should be kept alive as long as this method is called
+                // every frame
+                AbortController.Instance().KeepAlive(promise);
+
+                return promise?.CurState != PromiseState.Pending;
+            });
         }
 
         public static CustomYieldInstruction WaitForRequest(IPromise request)
         {
-            return new WaitUntil(() => ((Promise)request).CurState != PromiseState.Pending);
+            var promise = request as Promise;
+
+            return new WaitUntil(() =>
+            {
+                // Signal to the abort controller that the Promise should be kept alive as long as this method is called
+                // every frame
+                AbortController.Instance().KeepAlive(promise);
+
+                return promise?.CurState != PromiseState.Pending;
+            });
         }
         
         /// <summary>
@@ -245,7 +284,7 @@ namespace KindMen.Uxios
         /// <param name="promise"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        private static IEnumerator AsCoroutine<T>(Promise<T> promise)
+        private static IEnumerator AsCoroutine<T>(IPromise<T> promise)
         {
             yield return WaitForRequest(promise);
         }

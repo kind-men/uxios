@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using KindMen.Uxios.Errors;
+using KindMen.Uxios.Errors.Connection;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEngine;
@@ -173,14 +173,10 @@ namespace KindMen.Uxios.Tests.HttpClient
         {
             var url = new Uri("https://httpbin.org/delay/10");
 
-            var cancellationSource = new CancellationTokenSource();
-            
-            var customConfig = Config.Default();
-            var configWithCancellation = customConfig.CancelUsing(cancellationSource);
-            var promise = uxios.Get<string>(url, configWithCancellation);
+            var promise = uxios.Get<string>(url);
 
             yield return new WaitForSeconds(1);
-            cancellationSource.Cancel();
+            uxios.Abort(promise);
             
             yield return PromiseAssertions.AssertPromiseErrors(
                 promise, 
@@ -188,7 +184,8 @@ namespace KindMen.Uxios.Tests.HttpClient
                 {
                     var error = e as Error;
                     Assert.That(error, Is.Not.Null);
-                    Assert.That(error, Is.TypeOf<ConnectionError>());
+                    Assert.That(error, Is.InstanceOf<ConnectionError>());
+                    Assert.That(error, Is.InstanceOf<RequestAbortedError>());
                     Assert.That(error.Response, Is.Null);
                     Assert.That(error.Message, Is.EqualTo("Request aborted"));
                 }

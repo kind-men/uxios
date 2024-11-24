@@ -14,7 +14,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A Request Id is now available with Request objects, an internal id is used unless the user provides a header 
   X-Request-Id, in which case that will also internally be used as id for the request.
 - `Uxios.AsCoroutine` - a wrapper around a promise that will allow it to be used in situations where you just _must_ 
-  have a coroutine. _Don't use this when you don't need to, some libraries require coroutines_.
+  have a coroutine. _Don't use this when you don't need to, some libraries require coroutines_. See
+  https://kind-men.github.io/uxios/explanation/coroutines/ for more information.
+- Automatic cancellation of requests if Coroutines are stopped using StopCoroutine. A Keep Alive mechanism is introduced
+  that will check whether a Coroutine / subprocess is alive every frame.
+- Aborting a request will issue more specific Error: `RequestAbortedError`, which inherits from `ConnectionError`.
+
+### Changed
+
+- Cancellation - you must now use `Uxios.Abort` to manually abort a promise' HTTP request instead of passing a 
+  CancellationToken and managing the CancellationTokenSource manually. See 
+  https://kind-men.github.io/uxios/guides/cancellation/ for more information.
+
+### Removed
+
+- Cancellation Tokens passed into the Config are now ignored - Uxios' new cancellation mechanism will completely manage
+  the tokens and source, use `Uxios.Abort` to abort a running promise
 
 ## [0.2.0] - 2024-11-18
 

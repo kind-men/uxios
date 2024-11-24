@@ -47,8 +47,6 @@ namespace KindMen.Uxios.Tests
 
         public class PokemonApi
         {
-            private readonly Uxios uxios = new();
-
             public IPromise<Pokemon> GetPokemonAsync(string name)
             {
                 return Resource<Pokemon>.At("https://pokeapi.co/api/v2/pokemon/" + name).Value;
