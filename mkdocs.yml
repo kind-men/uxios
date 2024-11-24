@@ -9,7 +9,8 @@ nav:
       - "guides/index.md"
       - 'guides/fetching-pokemon.md' 
       - 'guides/fetching-pokemon-using-get.md' 
-      - 'guides/fetching-untyped-json-responses.md' 
+      - 'guides/fetching-untyped-json-responses.md'
+      - 'guides/building-urls-with-query-parameters.md'
       - 'guides/uri-templates.md' 
       - 'guides/cancellation.md' 
       - 'guides/working-with-persistent-data.md' 
@@ -31,6 +32,7 @@ nav:
       - 'reference/request.md'
       - 'reference/response.md'
       - 'reference/error.md'
+      - 'reference/querystrings.md'
   - 'Community':
     - 'getting-support.md'
     - 'reporting-bugs.md'

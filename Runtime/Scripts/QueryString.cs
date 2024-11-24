@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 #if UNITY_WEBGL
 using UnityEngine.Networking;
 #endif
@@ -135,6 +138,59 @@ namespace KindMen.Uxios
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Serializes the given object into a query parameters string.
+        /// </summary>
+        /// <remarks>
+        /// The object is first serialized into JSON using Newtonsoft JSON.net and then converted into a 
+        /// NameValueCollection. Each property of the object becomes a key-value pair. Use attributes like
+        /// <see cref="JsonPropertyAttribute"/> to map property names when keys in the query parameters contain
+        /// special characters (e.g., hyphens).
+        ///
+        /// Note that this method does not support nested objects or complex data structures, as they cannot be
+        /// represented as query parameters. Ensure your object properties are simple types like strings, numbers, or
+        /// booleans.
+        /// </remarks>
+        /// <typeparam name="T">The type of the object to serialize.</typeparam>
+        /// <param name="parameters">The object containing the data to serialize.</param>
+        /// <returns>A query parameters string where keys and values correspond to the object's properties.</returns>
+        public static string Serialize<T>(T parameters)
+        {
+            var json = JsonConvert.SerializeObject(parameters);
+            var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            
+            var nameValueCollection = new NameValueCollection();
+            foreach (var kvp in dictionary)
+            {
+                nameValueCollection.Add(kvp.Key, kvp.Value);
+            }
+            
+            return Encode(nameValueCollection);
+        }
+
+        /// <summary>
+        /// Deserializes the given query parameters string into an object of the specified type.
+        /// </summary>
+        /// <remarks>
+        /// This method uses Newtonsoft JSON.net to populate the given type. The query parameters string is 
+        /// first decoded into a NameValueCollection, then serialized into a JSON string, and finally 
+        /// deserialized into the target object type. Use attributes like <see cref="JsonPropertyAttribute"/> 
+        /// to map property names when keys in the query parameters contain special characters (e.g., hyphens).
+        /// 
+        /// Note: The type <typeparamref name="T"/> must be a class or struct with properties that match 
+        /// the query parameter keys. Nested types or complex data structures are not supported by this method.
+        /// </remarks>
+        /// <typeparam name="T">The type of the object to deserialize into.</typeparam>
+        /// <param name="queryParameters">The query parameters string to deserialize.</param>
+        /// <returns>An object of type <typeparamref name="T"/> populated with data from the query parameters.</returns>
+        public static T Deserialize<T>(string queryParameters)
+        {
+            var nvc = Decode(queryParameters);
+            string json = JsonConvert.SerializeObject(nvc.AllKeys.ToDictionary(k => k, k => nvc[k]));
+
+            return JsonConvert.DeserializeObject<T>(json);
         }
     }
 }

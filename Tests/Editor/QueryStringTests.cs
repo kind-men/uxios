@@ -5,6 +5,13 @@ namespace KindMen.Uxios.Tests
 {
     public class QueryStringTests
     {
+        public class TestObject
+        {
+            public string Name { get; set; }
+            public int Age { get; set; }
+            public bool IsActive { get; set; }
+        }
+
         [Test]
         public void SpaceIsEscapedToPlus()
         {
@@ -144,6 +151,75 @@ namespace KindMen.Uxios.Tests
             var result = QueryString.Decode(input);
             
             Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public void SerializingAnObjectShouldReturnValidQueryString()
+        {
+            // Arrange
+            var testObject = new TestObject
+            {
+                Name = "John Doe",
+                Age = 30,
+                IsActive = true
+            };
+
+            // Act
+            string queryString = QueryString.Serialize(testObject);
+
+            // Assert
+            Assert.That(queryString, Is.EqualTo("Name=John+Doe&Age=30&IsActive=true"));
+        }
+
+        [Test]
+        public void DeserializingAStringShouldPopulateObjectCorrectly()
+        {
+            // Arrange
+            string queryString = "Name=John%20Doe&Age=30&IsActive=true";
+
+            // Act
+            var result = QueryString.Deserialize<TestObject>(queryString);
+
+            // Assert
+            Assert.AreEqual("John Doe", result.Name);
+            Assert.AreEqual(30, result.Age);
+            Assert.IsTrue(result.IsActive);
+        }
+
+        [Test]
+        public void DeserializingShouldTreatKeysCaseInsensitive()
+        {
+            // Arrange
+            string queryString = "name=John%20Doe&age=30&isActive=true";
+
+            // Act
+            var result = QueryString.Deserialize<TestObject>(queryString);
+
+            // Assert
+            Assert.AreEqual("John Doe", result.Name);
+            Assert.AreEqual(30, result.Age);
+            Assert.IsTrue(result.IsActive);
+        }
+
+        [Test]
+        public void SerializeAndDeserializeShouldPreserveData()
+        {
+            // Arrange
+            var originalObject = new TestObject
+            {
+                Name = "Jane Doe",
+                Age = 25,
+                IsActive = false
+            };
+
+            // Act
+            string queryString = QueryString.Serialize(originalObject);
+            var deserializedObject = QueryString.Deserialize<TestObject>(queryString);
+
+            // Assert
+            Assert.AreEqual(originalObject.Name, deserializedObject.Name);
+            Assert.AreEqual(originalObject.Age, deserializedObject.Age);
+            Assert.AreEqual(originalObject.IsActive, deserializedObject.IsActive);
         }
     }
 }

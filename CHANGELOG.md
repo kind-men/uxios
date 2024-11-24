@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic cancellation of requests if Coroutines are stopped using StopCoroutine. A Keep Alive mechanism is introduced
   that will check whether a Coroutine / subprocess is alive every frame.
 - Aborting a request will issue more specific Error: `RequestAbortedError`, which inherits from `ConnectionError`.
+- Query strings can now be serialized and deserialized to and from structs/classes using `QueryString.Serialize` and
+  `QueryString.Deserialize` for type-safe declarations of query parameters.
 
 ### Changed
 
