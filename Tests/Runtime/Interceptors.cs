@@ -130,7 +130,7 @@ namespace KindMen.Uxios.Tests
             };
         }
 
-        private ResponseInterception AssertResponseInterception(Action<Response> assertions)
+        private ResponseInterception AssertResponseInterception(Action<IResponse> assertions)
         {
             return response =>
             {

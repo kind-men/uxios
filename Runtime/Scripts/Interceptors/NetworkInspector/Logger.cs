@@ -31,7 +31,7 @@ namespace KindMen.Uxios.Interceptors.NetworkInspector
         
         public abstract Config OnRequestSuccess(Config config);
         public abstract Error OnRequestError(Error error);
-        public abstract Response OnResponseSuccess(Response response);
+        public abstract IResponse OnResponseSuccess(IResponse response);
         public abstract Error OnResponseError(Error error);
     }
 }

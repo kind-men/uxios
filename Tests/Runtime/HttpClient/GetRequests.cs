@@ -433,7 +433,7 @@ namespace KindMen.Uxios.Tests.HttpClient
             );
         }
 
-        private static List<ExamplePost> AssertReceivedCollectionOfPosts(Response response, int numberOfResults)
+        private static List<ExamplePost> AssertReceivedCollectionOfPosts(IResponse response, int numberOfResults)
         {
             Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Data, Is.TypeOf<List<ExamplePost>>());
@@ -444,7 +444,7 @@ namespace KindMen.Uxios.Tests.HttpClient
             return posts;
         }
 
-        private void AssertExampleHtmlWasReceived(Response response)
+        private void AssertExampleHtmlWasReceived(IResponse response)
         {
             Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Data, Is.TypeOf<string>());

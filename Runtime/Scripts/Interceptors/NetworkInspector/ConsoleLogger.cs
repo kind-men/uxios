@@ -23,7 +23,7 @@ namespace KindMen.Uxios.Interceptors.NetworkInspector
             return error;
         }
 
-        public override Response OnResponseSuccess(Response response)
+        public override IResponse OnResponseSuccess(IResponse response)
         {
             var data = JsonConvert.SerializeObject(response, Formatting.Indented);
 

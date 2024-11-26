@@ -7,7 +7,7 @@ namespace KindMen.Uxios.Interceptors
     {
         public readonly int Priority = Interceptors.DefaultSystemPriority;
 
-        public Response OnResponseSuccess(Response response)
+        public IResponse OnResponseSuccess(IResponse response)
         {
             response.Data = response.Config.TypeOfResponseType switch
             {

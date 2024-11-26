@@ -6,7 +6,7 @@ namespace KindMen.Uxios
 {
     public static class ErrorFactory
     {
-        public static Error Create(Response response, Exception e = null)
+        public static Error Create(IResponse response, Exception e = null)
         {
             return (int)response.Status switch
             {

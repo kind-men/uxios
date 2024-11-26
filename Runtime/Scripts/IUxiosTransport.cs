@@ -6,6 +6,6 @@ namespace KindMen.Uxios
     {
         public string[] SupportedSchemes => new string[]{};
         
-        Promise<Response> PerformRequest<TData>(Config config) where TData : class;
+        Promise<IResponse> PerformRequest<TData>(Config config) where TData : class;
     }
 }

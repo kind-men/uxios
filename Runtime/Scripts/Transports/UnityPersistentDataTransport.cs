@@ -36,22 +36,22 @@ namespace KindMen.Uxios.Transports
             return unityPersistentDataTransport;
         }
 
-        public Promise<Response> PerformRequest<TData>(Config config) where TData : class
+        public Promise<IResponse> PerformRequest<TData>(Config config) where TData : class
         {
-            var promise = new Promise<Response>();
+            var promise = new Promise<IResponse>();
 
             StartCoroutine(DoRequest<TData>(config, promise));
 
             return promise;
         }
 
-        private IEnumerator DoRequest<TData>(Config config, Promise<Response> promise) where TData : class
+        private IEnumerator DoRequest<TData>(Config config, Promise<IResponse> promise) where TData : class
         {
             var uxiosRequest = TransportActions.CreateRequest<TData>(ref config);
 
             // By default, any unhandled Method type will return a MethodNotAllowed response; this will not reject the
             // promise outright, as the ValidateResponse action in the config will do that
-            Func<Config, Request, Response> responseCreator = (config, request) => 
+            Func<Config, Request, IResponse> responseCreator = (config, request) => 
                 CreateResponse(config, request, HttpStatusCode.MethodNotAllowed);
 
             // Convert Url into a Path to retrieve the file from the persistentDataPath
@@ -120,17 +120,18 @@ namespace KindMen.Uxios.Transports
             );
         }
 
-        private static Response CreateResponse(Config config, Request request, HttpStatusCode status)
+        private static IResponse CreateResponse(Config config, Request request, HttpStatusCode status)
         {
             return new Response
             {
                 Config = config,
                 Request = request,
-                Status = status
+                Status = status,
+                Data = ""
             };
         }
 
-        private void RejectDuringRequest(Config config, Promise<Response> promise, UnityWebRequest request)
+        private void RejectDuringRequest(Config config, Promise<IResponse> promise, UnityWebRequest request)
         {
             TransportActions.RejectWithErrorDuringRequest(
                 promise,

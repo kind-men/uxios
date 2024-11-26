@@ -6,7 +6,7 @@
 
         public Error OnRequestError(Error error);
 
-        public Response OnResponseSuccess(Response response);
+        public IResponse OnResponseSuccess(IResponse response);
 
         public Error OnResponseError(Error error);
     }

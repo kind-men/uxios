@@ -30,9 +30,9 @@ namespace KindMen.Uxios.Transports
             return unityWebRequestTransport;
         }
 
-        public Promise<Response> PerformRequest<TData>(Config config) where TData : class
+        public Promise<IResponse> PerformRequest<TData>(Config config) where TData : class
         {
-            var promise = new Promise<Response>();
+            var promise = new Promise<IResponse>();
             
             // We don't need to store the coroutine reference because the cancellation token in the 
             // config will self-abort the coroutine if it needs to be cancelled
@@ -41,7 +41,7 @@ namespace KindMen.Uxios.Transports
             return promise;
         }
 
-        private IEnumerator DoRequest<TData>(Config config, Promise<Response> promise) where TData : class
+        private IEnumerator DoRequest<TData>(Config config, Promise<IResponse> promise) where TData : class
         {
             var uxiosRequest = TransportActions.CreateRequest<TData>(ref config);
             var unityWebRequest = ConvertToUnityWebRequest(config, uxiosRequest);
@@ -73,7 +73,7 @@ namespace KindMen.Uxios.Transports
             );
         }
 
-        private void RejectDuringRequest(Config config, Promise<Response> promise, UnityWebRequest request)
+        private void RejectDuringRequest(Config config, Promise<IResponse> promise, UnityWebRequest request)
         {
             TransportActions.RejectWithErrorDuringRequest(
                 promise, 

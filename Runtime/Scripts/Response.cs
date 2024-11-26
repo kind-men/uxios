@@ -6,38 +6,38 @@ namespace KindMen.Uxios
     /// <summary>
     /// Represents the response of an HTTP request in Uxios.
     /// </summary>
-    public class Response
+    public class Response : IResponse
     {
         /// <summary>
         /// Gets the HTTP status code returned by the server.
         /// Indicates the success or failure of the request (e.g., 200 for success, 404 for not found).
         /// </summary>
-        public HttpStatusCode Status;
+        public HttpStatusCode Status { get; set; }
         
         /// <summary>
         /// Gets the headers returned in the response.
         /// Contains key-value pairs representing HTTP headers, such as "Content-Type" or "Authorization".
         /// </summary>
-        public Headers Headers = new();
+        public Headers Headers  { get; set; } = new();
 
         /// <summary>
         /// Gets the original request that initiated this response.
         /// Provides access to details about the request, such as the URL and HTTP method.
         /// </summary>
-        public Request Request;
+        public Request Request { get; set; }
 
         /// <summary>
         /// Gets the configuration settings used for the request.
         /// This includes options such as timeout settings, custom headers, and validation rules.
         /// </summary>        
-        public Config Config;
+        public Config Config { get; set; }
 
         /// <summary>
         /// Contains the data returned by the request. 
         /// This is the deserialized content of the response, typically the class you provided, and its type varies
         /// based on the request configuration.
         /// </summary>
-        public object Data = new byte[] { };
+        public object Data { get; set; } = default;
 
         /// <summary>
         /// Validates the response status using the validation function defined in the configuration.

@@ -8,9 +8,9 @@ namespace KindMen.Uxios.Transports
     internal sealed class InMemoryTransport : IUxiosTransport
     {
         private static InMemoryTransport inMemoryTransport;
-        private readonly List<Response> transactions = new();
+        private readonly List<IResponse> transactions = new();
 
-        public List<Response> Transactions => transactions;
+        public List<IResponse> Transactions => transactions;
 
         public string[] SupportedSchemes => new[] { "memory" };
 
@@ -23,16 +23,16 @@ namespace KindMen.Uxios.Transports
             return inMemoryTransport;
         }
 
-        public Promise<Response> PerformRequest<TData>(Config config) where TData : class
+        public Promise<IResponse> PerformRequest<TData>(Config config) where TData : class
         {
-            var promise = new Promise<Response>();
+            var promise = new Promise<IResponse>();
 
             DoRequest<TData>(config, promise);
 
             return promise;
         }
 
-        private void DoRequest<TData>(Config config, Promise<Response> promise) where TData : class
+        private void DoRequest<TData>(Config config, Promise<IResponse> promise) where TData : class
         {
             var uxiosRequest = TransportActions.CreateRequest<TData>(ref config);
             
@@ -48,10 +48,10 @@ namespace KindMen.Uxios.Transports
             );
         }
 
-        private Response SendRequest(Config config, Request uxiosRequest)
+        private IResponse SendRequest(Config config, Request uxiosRequest)
         {
             // TODO: instead of returning a generic response, we could add stubbing support for tests
-            Response response = new FakedWebResponse(
+            IResponse response = new FakedWebResponse(
                 config,
                 uxiosRequest, 
                 HttpStatusCode.OK, 

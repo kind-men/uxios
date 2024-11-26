@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cancellation - you must now use `Uxios.Abort` to manually abort a promise' HTTP request instead of passing a 
   CancellationToken and managing the CancellationTokenSource manually. See 
   https://kind-men.github.io/uxios/guides/cancellation/ for more information.
+- Added an interface above the Response object to make it easier to replace or change the response in the future
 
 ### Removed
 

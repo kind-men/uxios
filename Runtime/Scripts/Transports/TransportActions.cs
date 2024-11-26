@@ -20,13 +20,13 @@ namespace KindMen.Uxios.Transports
         }
 
         public static void HandleResponse(
-            Promise<Response> promise, 
+            Promise<IResponse> promise, 
             Config config, 
             Request uxiosRequest, 
-            Func<Config, Request, Response> responseCreator
+            Func<Config, Request, IResponse> responseCreator
         )
         {
-            Response response = null;
+            IResponse response = null;
             
             // If an exception occurs in the whole response interpretation chain, reject the promise
             try
@@ -70,7 +70,7 @@ namespace KindMen.Uxios.Transports
             return config;
         }
 
-        public static Response ApplyResponseInterceptors(Response response)
+        public static IResponse ApplyResponseInterceptors(IResponse response)
         {
             foreach (var responseInterceptor in Uxios.DefaultInstance.Interceptors.response)
             {
@@ -80,12 +80,12 @@ namespace KindMen.Uxios.Transports
             return response;
         }
         
-        public static void RejectResponse(Promise<Response> promise, Response response)
+        public static void RejectResponse(Promise<IResponse> promise, IResponse response)
         {
             RejectWithErrorDuringResponse(promise, ErrorFactory.Create(response));
         }
 
-        public static void RejectWithErrorDuringRequest(Promise<Response> promise, Error error)
+        public static void RejectWithErrorDuringRequest(Promise<IResponse> promise, Error error)
         {
             foreach (var interceptor in Uxios.DefaultInstance.Interceptors.request)
             {
@@ -95,7 +95,7 @@ namespace KindMen.Uxios.Transports
             promise.Reject(error);
         }
 
-        public static void RejectWithErrorDuringResponse(Promise<Response> promise, Error error)
+        public static void RejectWithErrorDuringResponse(Promise<IResponse> promise, Error error)
         {
             foreach (var responseInterceptor in Uxios.DefaultInstance.Interceptors.response)
             {

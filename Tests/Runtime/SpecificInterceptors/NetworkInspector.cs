@@ -33,7 +33,7 @@ namespace KindMen.Uxios.Tests.SpecificInterceptors
             );
         }
 
-        private void AssertExampleHtmlWasReceived(Response obj)
+        private void AssertExampleHtmlWasReceived(IResponse obj)
         {
             // TODO: Test whether the logger's calls were actually received - now we mainly test that the interceptors
             //  don't break the application

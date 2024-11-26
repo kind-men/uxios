@@ -1,7 +1,7 @@
 ﻿namespace KindMen.Uxios.Interceptors
 {
     public delegate Config RequestInterception(Config request);
-    public delegate Response ResponseInterception(Response response);
+    public delegate IResponse ResponseInterception(IResponse response);
     public delegate Error ErrorInterception(Error error);
 
     public sealed class Interceptors

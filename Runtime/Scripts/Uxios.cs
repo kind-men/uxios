@@ -74,7 +74,7 @@ namespace KindMen.Uxios
             }
         }
 
-        private Promise<Response> Request<TData>(Config config) where TData : class
+        private Promise<IResponse> Request<TData>(Config config) where TData : class
         {
             // When the user or none of the other methods set a response type, grab the default one from the resolver
             config.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve(config);
@@ -95,7 +95,7 @@ namespace KindMen.Uxios
             return promise;
         }
 
-        public Promise<Response> Get(Uri url, Config config = null)
+        public Promise<IResponse> Get(Uri url, Config config = null)
         {
             config = Config.BasedOn(config ?? defaultConfig)
                 .At(url)
@@ -104,7 +104,7 @@ namespace KindMen.Uxios
             return Request<byte[]>(config);
         }
 
-        public Promise<Response> Get(Uri url, QueryParameters parameters, Config config = null)
+        public Promise<IResponse> Get(Uri url, QueryParameters parameters, Config config = null)
         {
             config = Config.BasedOn(config ?? defaultConfig);
             config.Params = parameters;
@@ -112,7 +112,7 @@ namespace KindMen.Uxios
             return Get(url, config);
         }
 
-        public Promise<Response> Get<TResponse>(Uri url, Config config = null)
+        public Promise<IResponse> Get<TResponse>(Uri url, Config config = null)
         {
             config = Config.BasedOn(config ?? defaultConfig);
 
@@ -122,7 +122,7 @@ namespace KindMen.Uxios
             return Request<byte[]>(config);
         }
 
-        public Promise<Response> Get<TResponse>(Uri url, QueryParameters parameters, Config config = null)
+        public Promise<IResponse> Get<TResponse>(Uri url, QueryParameters parameters, Config config = null)
         {
             config = Config.BasedOn(config ?? defaultConfig);
             config.Params = parameters;
@@ -130,7 +130,7 @@ namespace KindMen.Uxios
             return Get<TResponse>(url, config);
         }
 
-        public Promise<Response> Delete(Uri url, Config config = null)
+        public Promise<IResponse> Delete(Uri url, Config config = null)
         {
             config = Config.BasedOn(config ?? defaultConfig);
             config.At(url).UsingMethod(HttpMethod.Delete);
@@ -138,7 +138,7 @@ namespace KindMen.Uxios
             return Request<byte[]>(config);
         }
 
-        public Promise<Response> Head(Uri url, Config config = null)
+        public Promise<IResponse> Head(Uri url, Config config = null)
         {
             config = Config.BasedOn(config ?? defaultConfig);
             config.At(url).UsingMethod(HttpMethod.Head);
@@ -146,7 +146,7 @@ namespace KindMen.Uxios
             return Request<byte[]>(config);
         }
 
-        public Promise<Response> Options(Uri url, Config config = null)
+        public Promise<IResponse> Options(Uri url, Config config = null)
         {
             config = Config.BasedOn(config ?? defaultConfig);
             config.At(url).UsingMethod(HttpMethod.Options);
@@ -154,17 +154,17 @@ namespace KindMen.Uxios
             return Request<byte[]>(config);
         }
 
-        public Promise<Response> Post(Uri url, byte[] data = null, Config config = null)
+        public Promise<IResponse> Post(Uri url, byte[] data = null, Config config = null)
         {
             return Post<byte[], byte[]>(url, data, config);
         }
 
-        public Promise<Response> Post(Uri url, string data = null, Config config = null)
+        public Promise<IResponse> Post(Uri url, string data = null, Config config = null)
         {
             return Post<string, byte[]>(url, data, config);
         }
 
-        public Promise<Response> Post<TRequestData, TResponse>(
+        public Promise<IResponse> Post<TRequestData, TResponse>(
             Uri url, 
             TRequestData data = null, 
             Config config = null
@@ -178,17 +178,17 @@ namespace KindMen.Uxios
             return Request<TRequestData>(config);
         }
 
-        public Promise<Response> Put(Uri url, byte[] data, Config config = null)
+        public Promise<IResponse> Put(Uri url, byte[] data, Config config = null)
         {
             return Put<byte[], byte[]>(url, data, config);
         }
 
-        public Promise<Response> Put(Uri url, string data, Config config = null)
+        public Promise<IResponse> Put(Uri url, string data, Config config = null)
         {
             return Put<string, byte[]>(url, data, config);
         }
 
-        public Promise<Response> Put<TRequestData, TResponse>(
+        public Promise<IResponse> Put<TRequestData, TResponse>(
             Uri url, 
             TRequestData data = null, 
             Config config = null
@@ -203,17 +203,17 @@ namespace KindMen.Uxios
             return Request<TRequestData>(config);
         }
 
-        public Promise<Response> Patch(Uri url, byte[] data, Config config = null)
+        public Promise<IResponse> Patch(Uri url, byte[] data, Config config = null)
         {
             return Patch<byte[], byte[]>(url, data, config);
         }
 
-        public Promise<Response> Patch(Uri url, string data, Config config = null)
+        public Promise<IResponse> Patch(Uri url, string data, Config config = null)
         {
             return Patch<string, byte[]>(url, data, config);
         }
 
-        public Promise<Response> Patch<TRequestData, TResponse>(
+        public Promise<IResponse> Patch<TRequestData, TResponse>(
             Uri url, 
             TRequestData data = null, 
             Config config = null
