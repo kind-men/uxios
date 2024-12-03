@@ -5,7 +5,7 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0]
 
 ### Added
 
@@ -33,6 +33,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Cancellation Tokens passed into the Config are now ignored - Uxios' new cancellation mechanism will completely manage
   the tokens and source, use `Uxios.Abort` to abort a running promise
+
+### Fixed
+
+- Downloading files using the FileInfo generic sometimes errored because application/octetstream was given as mimtype,
+  but a webserver could return a 406 if it was configured to accept limited mime types for a file. To fix this, we
+  do not pass an accept header at all but let the browser figure it out.
 
 ## [0.2.0] - 2024-11-18
 

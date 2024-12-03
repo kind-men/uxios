@@ -1,6 +1,4 @@
-﻿using KindMen.Uxios.Http;
-
-namespace KindMen.Uxios.ExpectedTypesOfResponse
+﻿namespace KindMen.Uxios.ExpectedTypesOfResponse
 {
     public sealed class FileResponse : ExpectedTypeOfResponse
     {
@@ -8,7 +6,9 @@ namespace KindMen.Uxios.ExpectedTypesOfResponse
 
         public override void AddMetadataToRequest(Request request)
         {
-            request.Headers.TryAdd(Headers.Accept, "application/octet-stream");
+            // We do not add accept headers because we rely on the default handling
+            // of the browser - previously I used `application/octetstream`, but some
+            // webserver configuration started rejecting requests using a 406 error
         }
     }
 }
