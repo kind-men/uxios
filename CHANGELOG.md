@@ -5,6 +5,13 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2025-02-10
+
+### Fixed
+
+- Removed automatic setting of the application/octet-stream content type if a request's contents is null or a byte-array.
+  This will always trigger a CORS preflight, and some webservers seem ill-equipped to handle this.
+
 ## [0.3.0]
 
 ### Added
