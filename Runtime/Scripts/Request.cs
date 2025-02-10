@@ -138,13 +138,13 @@ namespace KindMen.Uxios
             T dataToSend = data as T;
             if (dataToSend == null)
             {
-                return ("application/octet-stream", new byte[]{});
+                return (null, new byte[]{});
             }
             
             switch (dataToSend)
             {
                 case byte[] asByteArray:
-                    return ("application/octet-stream", bytes: asByteArray);
+                    return (null, bytes: asByteArray);
                 case string asString:
                     return ("text/plain", bytes: Encoding.UTF8.GetBytes(asString));
                 case object asObject:
