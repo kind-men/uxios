@@ -5,12 +5,23 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2025-02-17
+
+### Fixed
+
+- Removed automatic setting of the application/octet-stream content type if a request's contents is null or a byte-array
+  when retrieving a Byte Array, including a texture. This will always trigger a CORS preflight, and some webservers seem 
+  ill-equipped to handle this.
+- Only create an ExpectedTypeOfResponse object if none is present in the configuration; this way you can pass your own 
+  options to certain responses, such as setting the Readable flag for a texture.
+
 ## [0.3.1] - 2025-02-10
 
 ### Fixed
 
-- Removed automatic setting of the application/octet-stream content type if a request's contents is null or a byte-array.
-  This will always trigger a CORS preflight, and some webservers seem ill-equipped to handle this.
+- Removed automatic setting of the application/octet-stream content type if a request's contents is null or a byte-array
+  when retrieving the file as a cached FileInfo. This will always trigger a CORS preflight, and some webservers seem 
+  ill-equipped to handle this.
 
 ## [0.3.0]
 

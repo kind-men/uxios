@@ -13,7 +13,7 @@ namespace KindMen.Uxios
 {
     public sealed class Uxios
     {
-        public const string Version = "0.2.1";
+        public const string Version = "0.3.2";
 
         private static Uxios defaultInstance;
         public Interceptors.Interceptors Interceptors { get; } = new();
@@ -117,7 +117,7 @@ namespace KindMen.Uxios
             config = Config.BasedOn(config ?? defaultConfig);
 
             config.At(url).UsingMethod(HttpMethod.Get);
-            config.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(config);
+            config.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve<TResponse>(config);
 
             return Request<byte[]>(config);
         }
@@ -173,7 +173,7 @@ namespace KindMen.Uxios
             config = Config.BasedOn(config ?? defaultConfig);
             config.At(url).UsingMethod(HttpMethod.Post);
             config.Data = data;
-            config.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(config);
+            config.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve<TResponse>(config);
 
             return Request<TRequestData>(config);
         }
@@ -198,7 +198,7 @@ namespace KindMen.Uxios
             
             config.At(url).UsingMethod(HttpMethod.Put);
             config.Data = data;
-            config.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(config);
+            config.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve<TResponse>(config);
 
             return Request<TRequestData>(config);
         }
@@ -224,7 +224,7 @@ namespace KindMen.Uxios
             config.At(url).UsingMethod(HttpMethod.Patch);
 
             config.Data = data;
-            config.TypeOfResponseType = expectedTypeOfResponseResolver.Resolve<TResponse>(config);
+            config.TypeOfResponseType ??= expectedTypeOfResponseResolver.Resolve<TResponse>(config);
 
             return Request<TRequestData>(config);
         }
