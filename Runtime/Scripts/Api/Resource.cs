@@ -59,6 +59,30 @@ namespace KindMen.Uxios.Api
         }
 
         /// <summary>
+        /// When it is time, get the resource with the given set of headers.
+        /// </summary>
+        public Resource<TResponse> With(Headers headers)
+        {
+            // Changing these parameters will make the cache invalid
+            InvalidateCache();
+            config.Headers = headers;
+
+            return this;
+        }
+
+        /// <summary>
+        /// When it is time, get the resource with the given set of headers.
+        /// </summary>
+        public Resource<TResponse> With(Header header)
+        {
+            // Changing these parameters will make the cache invalid
+            InvalidateCache();
+            config.Headers.Add(header);
+
+            return this;
+        }
+
+        /// <summary>
         /// When it is time, get or update the resource with the given data as its body.
         /// </summary>
         public Resource<TResponse> With<TRequestData>(TRequestData data)

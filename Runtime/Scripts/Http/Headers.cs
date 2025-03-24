@@ -15,6 +15,11 @@ namespace KindMen.Uxios.Http
         {
         }
 
+        public void Add(Header header)
+        {
+            this.Add(header.Name, header.Value);
+        }
+
         public Headers(IDictionary<string, string> dictionary) : base(dictionary)
         {
         }

@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using System.IO;
 using System.Net;
+using KindMen.Uxios.Errors.Http;
 using KindMen.Uxios.Http;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -65,6 +67,40 @@ namespace KindMen.Uxios.Tests
                     HttpAssertions.AssertStatusCode(response, HttpStatusCode.Unauthorized);
     
                     Assert.That(response.Data, Is.Null);
+                }
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator ErrorIfBasicAuthenticationIsNotProvidedWhileNeeded()
+        {
+            var url = new Uri("https://httpbin.org/basic-auth/username/password");
+            var promise = uxios.Get<FileInfo>(url);
+
+            yield return PromiseAssertions.AssertPromiseErrors(
+                promise,
+                exception =>
+                {
+                    AuthenticationError error = exception as AuthenticationError;
+                    Assert.That(error, Is.InstanceOf(typeof(AuthenticationError)));
+                    Assert.That(error, Is.TypeOf(typeof(UnauthorizedError)));
+                }
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator ErrorIfTokenBasedAuthenticationIsNotProvided()
+        {
+            var url = new Uri("https://tile.googleapis.com/v1/3dtiles/root.json");
+            var promise = uxios.Get<FileInfo>(url);
+
+            yield return PromiseAssertions.AssertPromiseErrors(
+                promise,
+                exception =>
+                {
+                    AuthenticationError error = exception as AuthenticationError;
+                    Assert.That(error, Is.InstanceOf(typeof(AuthenticationError)));
+                    Assert.That(error, Is.TypeOf(typeof(ForbiddenError)));
                 }
             );
         }

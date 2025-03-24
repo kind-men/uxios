@@ -90,6 +90,20 @@ namespace KindMen.Uxios
             return this;
         }
 
+        public Config AddHeader(string key, string value)
+        {
+            Headers.Add(key, value);
+
+            return this;
+        }
+
+        public Config AddHeader(Header header)
+        {
+            Headers.Add(header);
+
+            return this;
+        }
+
         public Config CancelUsing(CancellationTokenSource cancellationSource)
         {
             CancelToken = cancellationSource.Token;

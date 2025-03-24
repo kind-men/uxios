@@ -5,6 +5,15 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.3] - 2025-03-24
+
+### Added
+
+- A new `Header` value object to add headers to the Config object and Resource wrapper in an intuitive way
+- `Resource` now supports the `Header` class as an argument to the `With` method set to have a convenient way to
+  add headers using an intuitive interface
+- `Header` supports an explicit case from `Tuple<string, string>` to `Header` to easily instantiate them.
+
 ## [0.3.2] - 2025-02-17
 
 ### Fixed
