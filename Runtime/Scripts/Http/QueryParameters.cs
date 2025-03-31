@@ -17,6 +17,14 @@ namespace KindMen.Uxios.Http
             this.Add(QueryString.Decode(queryParameters));
         }
 
+        public override void Add(string name, string value)
+        {
+            // When adding - a null value will cause confusion as the NameValueCollection will strip it. 
+            value ??= string.Empty;
+
+            base.Add(name, value);
+        }
+
         public override string ToString()
         {
             return QueryString.Encode(this);

@@ -63,6 +63,28 @@
         }
 
         [Test]
+        public void ConvertToStringWithEmptySingleQueryParameter()
+        {
+            var queryParams = new QueryParameters();
+            queryParams.Add("key", string.Empty);
+
+            string result = queryParams.ToString();
+
+            Assert.That(result, Is.EqualTo("key="));
+        }
+
+        [Test]
+        public void ConvertToStringWithNullSingleQueryParameter()
+        {
+            var queryParams = new QueryParameters();
+            queryParams.Add("key", null);
+
+            string result = queryParams.ToString();
+
+            Assert.That(result, Is.EqualTo("key="));
+        }
+
+        [Test]
         public void ConvertToStringWithMultipleQueryParameters()
         {
             var queryParams = new QueryParameters();

@@ -53,7 +53,9 @@ namespace KindMen.Uxios
             var sb = new StringBuilder();
             foreach (string key in collection)
             {
-                foreach (string value in collection.GetValues(key))
+                // Make sure we never have a null exception here
+                var values = collection.GetValues(key) ?? Array.Empty<string>();
+                foreach (string value in values)
                 {
                     if (sb.Length > 0) sb.Append(sep);
                     string encodedKey;
