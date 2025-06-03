@@ -18,7 +18,11 @@ namespace KindMen.Uxios.Transports.Unity
 
         public static UploadHandler UploadHandler(Request request)
         {
-            return new UploadHandlerRaw(request.Data ?? new byte[] { });
+            var data = request.Data ?? new byte[] { };
+
+            // Unity will change the request headers when UploadHandlerRaw is provided - to properly handle requests we
+            // do not create an uploadHandler is there is no data.
+            return data.Length > 0 ? new UploadHandlerRaw(data) : null;
         }
     }
 }

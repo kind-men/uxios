@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using KindMen.Uxios.Errors;
 using KindMen.Uxios.Errors.Connection;
+using KindMen.Uxios.Http;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEngine;
@@ -446,6 +447,7 @@ namespace KindMen.Uxios.Tests.HttpClient
 
         private void AssertExampleHtmlWasReceived(IResponse response)
         {
+            Assert.That(response.Request.Headers.ContainsKey(Headers.ContentType), Is.False);
             Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Data, Is.TypeOf<string>());
             Assert.That(response.Data, Does.Contain("Herman Melville"));

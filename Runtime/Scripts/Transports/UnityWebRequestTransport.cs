@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using KindMen.Uxios.Errors;
+using KindMen.Uxios.Http;
 using KindMen.Uxios.Transports.Unity;
 using RSG;
 using UnityEngine;
@@ -98,6 +99,8 @@ namespace KindMen.Uxios.Transports
             webRequest.redirectLimit = config.MaxRedirects;
             webRequest.downloadHandler = HandlerFactory.DownloadHandler(config.TypeOfResponseType);
             webRequest.uploadHandler = HandlerFactory.UploadHandler(uxiosRequest);
+            
+            ApplyUploadHandlerToHeaderListing(uxiosRequest, webRequest.uploadHandler);
 
             foreach (var header in uxiosRequest.Headers)
             {
@@ -105,6 +108,29 @@ namespace KindMen.Uxios.Transports
             }
 
             return webRequest;
+        }
+
+        private static void ApplyUploadHandlerToHeaderListing(Request request, UploadHandler uploadHandler)
+        {
+            if (uploadHandler == null) return;
+            
+            // if there is a content type set - override unity's contentType in the upload handler to prevent
+            // header juggling by Unity in WebGL
+            if (request.Headers.TryGetValue(Headers.ContentType, out var contentType)) {
+                uploadHandler.contentType = contentType;
+                return;
+            }
+
+            // The unity upload handler can force a content type (or defaults to application/octet-stream), so we
+            // include that in the official list of headers:
+            // https://docs.unity3d.com/ScriptReference/Networking.UploadHandler-contentType.html
+            contentType = "application/octet-stream";
+            if (!string.IsNullOrEmpty(uploadHandler.contentType))
+            {
+                contentType = uploadHandler.contentType;
+            }
+
+            request.Headers[Headers.ContentType] = contentType;
         }
     }
 }

@@ -5,6 +5,15 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.5] - 2025-06-03
+
+### Fixed
+
+- Sending a request with no data will no longer receive a content type of "application/octet-stream" and thus 
+  potentially trigger a CORS Preflight request.
+- Handling of content types when posting data has been improved to properly register the content type on the 
+  UploadHandlerRaw and from that onto the Request's Headers.
+
 ## [0.3.4] - 2025-03-31
 
 ### Fixed
