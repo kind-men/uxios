@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace KindMen.Uxios.Http
 {
@@ -58,6 +59,22 @@ namespace KindMen.Uxios.Http
         public void Set(string key, List<string> value)
         {
             this[key].Set(value);
+        }
+
+        [CanBeNull]
+        public QueryParameter Get(string key)
+        {
+            if (!TryGetValue(key, out QueryParameter param)) return null;
+            
+            return param;
+        }
+
+        [CanBeNull]
+        public string Single(string key)
+        {
+            if (!TryGetValue(key, out QueryParameter param)) return null;
+            
+            return param.Single;
         }
 
         public IEnumerable<KeyValuePair<string, string>> AsPairs()
