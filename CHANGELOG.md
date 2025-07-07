@@ -5,6 +5,22 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-07-07
+
+### Changed
+
+- BREAKING: All uses of NameValueCollection are replaced with QueryParameters objects because of excessive garbage 
+  generation. In your code you should check if you use NameValueCollection objects to hold data on query parameters and  
+  change that to QueryParameter instances. This also means that iterating the result of Encode, Decode, Serialize and 
+  Deserialize will now return QueryParameter objects instead of strings. To get the actual values of a single query 
+  parameter, use the Values field.
+
+### Fixed
+
+- Reduced the amount of garbage generated when interacting with QueryParameters and when using the QueryString utility
+  class.
+
+
 ## [0.3.5] - 2025-06-03
 
 ### Fixed

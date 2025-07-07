@@ -42,10 +42,10 @@ string unescaped = QueryString.Unescape("Hello+World%21");
 
 #### **Encode**
 
-Converts a `NameValueCollection` into a query string.
+Converts a `QueryParameters` object into a query string.
 
 ```csharp
-var collection = new NameValueCollection
+var collection = new QueryParameters
 {
     { "key1", "value1" },
     { "key2", "value2" }
@@ -57,11 +57,11 @@ string queryString = QueryString.Encode(collection);
 
 #### **Decode**
 
-Parses a query string into a `NameValueCollection`.
+Parses a query string into a `QueryParameters` object.
 
 ```csharp
 string query = "key1=value1&key2=value2";
-NameValueCollection collection = QueryString.Decode(query);
+QueryParameters collection = QueryString.Decode(query);
 
 // collection["key1"] == "value1"
 // collection["key2"] == "value2"
@@ -71,7 +71,7 @@ NameValueCollection collection = QueryString.Decode(query);
 
 ### 3. `Merge`
 
-Combines two query strings or `NameValueCollection` objects.
+Combines two query strings or `QueryParameters` objects.
 
 #### Example: Merging Query Strings
 
@@ -83,13 +83,13 @@ string mergedQuery = QueryString.Merge(query1, query2);
 // Output: "key1=value1&key2=value2"
 ```
 
-#### Example: Merging `NameValueCollection` Objects
+#### Example: Merging `QueryParameters` Objects
 
 ```csharp
-var collection1 = new NameValueCollection { { "key1", "value1" } };
-var collection2 = new NameValueCollection { { "key2", "value2" } };
+var collection1 = new QueryParameters { { "key1", "value1" } };
+var collection2 = new QueryParameters { { "key2", "value2" } };
 
-NameValueCollection mergedCollection = QueryString.Merge(collection1, collection2);
+QueryParameters mergedCollection = QueryString.Merge(collection1, collection2);
 // mergedCollection["key1"] == "value1"
 // mergedCollection["key2"] == "value2"
 ```
@@ -136,7 +136,7 @@ Supports array-like keys with `[]` notation.
 ```csharp
 string query = "items[]=apple&items[]=banana";
 
-NameValueCollection collection = QueryString.Decode(query);
+QueryParameters collection = QueryString.Decode(query);
 // collection["items"] contains "apple" and "banana"
 
 string encoded = QueryString.Encode(collection);

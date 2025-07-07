@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using KindMen.Uxios.Http;
 using Newtonsoft.Json;
 #if UNITY_WEBGL
 using UnityEngine.Networking;
@@ -26,80 +25,135 @@ namespace KindMen.Uxios
     /// </remarks>
     public static class QueryString
     {
+        private static StringBuilder encodingStringBuilder = new();
+
         public static string Escape(string str)
         {
+            if (str == null) return null;
+
 #if UNITY_WEBGL
             // Use UnityWebRequest.EscapeURL in WebGL builds since there is a bug in the dotnet version used
-            return UnityWebRequest.EscapeURL(str).Replace("%20", "+");
+            var escapedString = UnityWebRequest.EscapeURL(str);
 #else
             // Use Uri.EscapeDataString for other platforms
-            return Uri.EscapeDataString(str).Replace("%20", "+");
+            var escapedString = Uri.EscapeDataString(str);
 #endif
+            // to reduce GC allocations - check if the string contains %20 and do not attempt to replace it
+            // when none is present
+            return escapedString.Contains("%20") ? escapedString.Replace("%20", "+") : escapedString;
         }
 
         public static string Unescape(string str)
         {
+            if (str == null) return null;
+
+            // Avoid allocation if '+' isn't present
+            var toUnescape = str.Contains("+") ? str.Replace("+", "%20") : str;
+
 #if UNITY_WEBGL
             // Use UnityWebRequest.UnEscapeURL in WebGL builds since there is a bug in the dotnet version used
-            return UnityWebRequest.UnEscapeURL(str.Replace("+", "%20"));
+            return UnityWebRequest.UnEscapeURL(toUnescape);
 #else
-            // Use Uri.UnescapeDataString for other platforms
-            return Uri.UnescapeDataString(str.Replace("+", "%20"));
+            return Uri.UnescapeDataString(toUnescape);
 #endif
         }
 
-        public static string Encode(NameValueCollection collection, string sep = "&", string eq = "=")
+        public static string Encode(QueryParameters parameters, string sep = "&", string eq = "=")
         {
-            var sb = new StringBuilder();
-            foreach (string key in collection)
+            encodingStringBuilder.Clear();
+            bool first = true;
+
+            foreach (var (key, values) in parameters)
             {
-                // Make sure we never have a null exception here
-                var values = collection.GetValues(key) ?? Array.Empty<string>();
+                bool isArrayKey = key.EndsWith("[]");
+                string keyPart = isArrayKey
+                    ? key[..^2]
+                    : key;
+
+                string encodedKey = Escape(keyPart);
+                if (isArrayKey)
+                {
+                    encodedKey += "[]";
+                }
+
                 foreach (string value in values)
                 {
-                    if (sb.Length > 0) sb.Append(sep);
-                    string encodedKey;
-                    if (key.EndsWith("[]"))
-                    {
-                        encodedKey = Escape(key.Substring(0, key.Length - 2)) + "[]";
-                    }
-                    else
-                    {
-                        encodedKey = Escape(key);
-                    }
+                    if (!first) encodingStringBuilder.Append(sep);
+                    first = false;
 
-                    sb.Append(encodedKey + eq + Escape(value));
+                    encodingStringBuilder.Append(encodedKey);
+                    encodingStringBuilder.Append(eq);
+                    encodingStringBuilder.Append(Escape(value));
                 }
             }
-            return sb.ToString();
+
+            return encodingStringBuilder.ToString();
         }
 
-        public static NameValueCollection Decode(string str, string sep = "&", string eq = "=")
+        public static QueryParameters Decode(string str, char sep = '&', char eq = '=')
         {
-            var collection = new NameValueCollection();
-            var pairs = str.Split(new string[] { sep }, StringSplitOptions.RemoveEmptyEntries);
-        
-            foreach (var pair in pairs)
-            {
-                var keyValue = pair.Split(new string[] { eq }, 2, StringSplitOptions.None);
-                if (keyValue.Length == 2)
-                {
-                    var key = Unescape(keyValue[0]);
-                    var value = Unescape(keyValue[1]);
+            var result = new QueryParameters();
 
-                    // If the key ends with [], treat it as an array-like key
-                    if (key.EndsWith("[]"))
-                    {
-                        var baseKey = key.Substring(0, key.Length - 2);  // Remove "[]" from the end
-                        collection.Add(baseKey, value);
-                    }
-                    else
-                    {
-                        collection.Add(key, value);
-                    }
-                }
+            if (string.IsNullOrEmpty(str))
+            {
+                return result;
             }
-            return collection;
+
+            int counter = 0;
+            int length = str.Length;
+
+            if (str[0] == '?') counter++; // skip leading '?'
+
+            while (counter < length)
+            {
+                int keyStart = counter;
+                int keyEnd = -1;
+                int valueStart = -1;
+                int valueEnd = -1;
+
+                while (counter < length)
+                {
+                    char character = str[counter];
+                    if (character == eq && keyEnd == -1)
+                    {
+                        keyEnd = counter;
+                        valueStart = counter + 1;
+                    }
+                    else if (character == sep)
+                    {
+                        valueEnd = counter;
+                        break;
+                    }
+                    counter++;
+                }
+
+                if (valueEnd == -1)
+                {
+                    valueEnd = counter;
+                }
+
+                if (keyEnd == -1)
+                {
+                    keyEnd = valueEnd;
+                    valueStart = valueEnd;
+                }
+
+                // Extract key and value substrings
+                string key = Unescape(str.Substring(keyStart, keyEnd - keyStart));
+                string value = Unescape(str.Substring(valueStart, valueEnd - valueStart));
+
+                // Handle "arrayKey[]"
+                if (key.EndsWith("[]"))
+                {
+                    key = key[..^2];
+                }
+
+                result.Add(key, value);
+
+                counter++; // skip past '&'
+            }
+
+            return result;
         }
 
         public static string Merge(string source, string mergeOnto)
@@ -107,35 +161,30 @@ namespace KindMen.Uxios
             return Encode(Merge(Decode(source), Decode(mergeOnto)));
         }
 
-        public static string Merge(string source, NameValueCollection mergeOnto)
+        public static string Merge(string source, QueryParameters mergeOnto)
         {
             return Encode(Merge(Decode(source), mergeOnto));
         }
 
-        public static NameValueCollection Merge(NameValueCollection source, string mergeOnto)
+        public static QueryParameters Merge(QueryParameters source, string mergeOnto)
         {
             return Merge(source, Decode(mergeOnto));
         }
 
-        public static NameValueCollection Merge(NameValueCollection source, NameValueCollection mergeOnto)
+        public static QueryParameters Merge(QueryParameters source, QueryParameters mergeOnto)
         {
-            var result = new NameValueCollection();
+            var result = new QueryParameters();
 
-            // Add all keys from the first collection
-            foreach (string key in source)
+            foreach (var (key, value) in source)
             {
-                foreach (var value in source.GetValues(key))
-                {
-                    result.Add(key, value);
-                }
+                result[key] = value;
             }
 
-            // Add keys from the second collection, merging values for duplicate keys
-            foreach (string key in mergeOnto)
+            foreach (var (key, value) in mergeOnto)
             {
-                foreach (var value in mergeOnto.GetValues(key))
+                foreach (var v in value)
                 {
-                    result.Add(key, value);
+                    result.Add(key, v);
                 }
             }
 
@@ -147,7 +196,7 @@ namespace KindMen.Uxios
         /// </summary>
         /// <remarks>
         /// The object is first serialized into JSON using Newtonsoft JSON.net and then converted into a 
-        /// NameValueCollection. Each property of the object becomes a key-value pair. Use attributes like
+        /// QueryParameters collection. Each property of the object becomes a key-value pair. Use attributes like
         /// <see cref="JsonPropertyAttribute"/> to map property names when keys in the query parameters contain
         /// special characters (e.g., hyphens).
         ///
@@ -163,13 +212,13 @@ namespace KindMen.Uxios
             var json = JsonConvert.SerializeObject(parameters);
             var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
             
-            var nameValueCollection = new NameValueCollection();
-            foreach (var kvp in dictionary)
+            var qp = new QueryParameters();
+            foreach (var (key, value) in dictionary)
             {
-                nameValueCollection.Add(kvp.Key, kvp.Value);
+                qp.Add(key, value);
             }
             
-            return Encode(nameValueCollection);
+            return Encode(qp);
         }
 
         /// <summary>
@@ -177,7 +226,7 @@ namespace KindMen.Uxios
         /// </summary>
         /// <remarks>
         /// This method uses Newtonsoft JSON.net to populate the given type. The query parameters string is 
-        /// first decoded into a NameValueCollection, then serialized into a JSON string, and finally 
+        /// first decoded into a QueryParameters object, then serialized into a JSON string, and finally 
         /// deserialized into the target object type. Use attributes like <see cref="JsonPropertyAttribute"/> 
         /// to map property names when keys in the query parameters contain special characters (e.g., hyphens).
         /// 
@@ -189,8 +238,11 @@ namespace KindMen.Uxios
         /// <returns>An object of type <typeparamref name="T"/> populated with data from the query parameters.</returns>
         public static T Deserialize<T>(string queryParameters)
         {
-            var nvc = Decode(queryParameters);
-            string json = JsonConvert.SerializeObject(nvc.AllKeys.ToDictionary(k => k, k => nvc[k]));
+            QueryParameters parameters = Decode(queryParameters);
+            
+            string json = JsonConvert.SerializeObject(
+                parameters.Keys.ToDictionary(k => k, k => string.Join(',', parameters[k].Values))
+            );
 
             return JsonConvert.DeserializeObject<T>(json);
         }

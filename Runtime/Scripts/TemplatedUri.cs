@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using UriParameters = KindMen.Uxios.Http.QueryParameters;
+using KindMen.Uxios.Http;
 
 namespace KindMen.Uxios
 {
     public class TemplatedUri
     {
         private readonly Uri uri;
-        private UriParameters parameters;
+        private QueryParameters parameters;
 
-        public TemplatedUri(Uri uri, UriParameters parameters = null)
+        public TemplatedUri(Uri uri, QueryParameters parameters = null)
         {
             this.uri = uri;
-            this.parameters = parameters ?? new UriParameters();
+            this.parameters = parameters ?? new QueryParameters();
         }
         
-        public TemplatedUri(string uri, UriParameters parameters = null) : this(new Uri(uri), parameters)
+        public TemplatedUri(string uri, QueryParameters parameters = null) : this(new Uri(uri), parameters)
         {
         }
 
@@ -28,7 +28,7 @@ namespace KindMen.Uxios
         {
             // The parameters collection is replaced with a new one so that the UriTemplate can really be used as a
             // template, and we do not inadvertently alter the original parameters
-            var newParameters = new UriParameters(parameters);
+            var newParameters = new QueryParameters(parameters);
             newParameters.Add(key, value);
 
             // Return a new instance with a similar footprint, this will have the original TemplatedUri remain untouched
@@ -41,7 +41,7 @@ namespace KindMen.Uxios
         /// initial parameters, and it can be chained into calls with more readability. Any parameters used in the
         /// process are consumed upon resolving, and will be removed so that only unused parameters remain.
         /// </summary>
-        public TemplatedUri Using(UriParameters parameters)
+        public TemplatedUri Using(QueryParameters parameters)
         {
             // Return a new instance with a similar footprint, this will have the original TemplatedUri remain untouched
             // and reusable as a template for other locations.

@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using System.Collections.Specialized;
+using KindMen.Uxios.Http;
 
 namespace KindMen.Uxios.Tests
 {
@@ -27,7 +27,7 @@ namespace KindMen.Uxios.Tests
         public void SpecialCharactersAreEscaped()
         {
             string input = "hello+world";
-            string expected = "hello%2Bworld";
+            string expected = "hello%2bworld";
 
             string result = QueryString.Escape(input);
 
@@ -59,7 +59,7 @@ namespace KindMen.Uxios.Tests
         [Test]
         public void EncodingASingleKeyValuePair()
         {
-            var collection = new NameValueCollection
+            var collection = new QueryParameters
             {
                 { "key", "value" }
             };
@@ -73,7 +73,7 @@ namespace KindMen.Uxios.Tests
         [Test]
         public void EncodingMultipleKeyValuePairs()
         {
-            var collection = new NameValueCollection
+            var collection = new QueryParameters
             {
                 { "key1", "value1" },
                 { "key2", "value2" }
@@ -88,7 +88,7 @@ namespace KindMen.Uxios.Tests
         [Test]
         public void EncodingArrayLikeKeys()
         {
-            var collection = new NameValueCollection
+            var collection = new QueryParameters
             {
                 { "arrayKey[]", "value1" },
                 { "arrayKey[]", "value2" }
@@ -103,7 +103,7 @@ namespace KindMen.Uxios.Tests
         [Test]
         public void EncodingAnEmptyCollectionReturnsEmptyString()
         {
-            var collection = new NameValueCollection();
+            var collection = new QueryParameters();
             
             string result = QueryString.Encode(collection);
 
@@ -117,7 +117,7 @@ namespace KindMen.Uxios.Tests
             
             var result = QueryString.Decode(input);
             
-            Assert.That("value", Is.EqualTo(result["key"]));
+            Assert.That("value", Is.EqualTo(result["key"].Values[0]));
         }
 
         [Test]
@@ -127,8 +127,8 @@ namespace KindMen.Uxios.Tests
 
             var result = QueryString.Decode(input);
             
-            Assert.That("value1", Is.EqualTo(result["key1"]));
-            Assert.That("value2", Is.EqualTo(result["key2"]));
+            Assert.That("value1", Is.EqualTo(result["key1"].Values[0]));
+            Assert.That("value2", Is.EqualTo(result["key2"].Values[0]));
         }
 
         [Test]

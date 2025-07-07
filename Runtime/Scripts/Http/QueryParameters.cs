@@ -1,9 +1,17 @@
-﻿using System.Collections.Specialized;
+﻿using System.Collections.Generic;
 
 namespace KindMen.Uxios.Http
 {
-    public sealed class QueryParameters : NameValueCollection
+    [System.Serializable]
+    public class QueryParameters : Dictionary<string, QueryParameter>
     {
+        public string[] GetValues(string key)
+            => TryGetValue(key, out var param)
+                ? param.Values.ToArray()
+                : null;
+
+        public int Length => Count;
+
         public QueryParameters()
         {
         }
@@ -12,22 +20,55 @@ namespace KindMen.Uxios.Http
         {
         }
 
-        public QueryParameters(string queryParameters)
+        public QueryParameters(string queryParameters) : this(QueryString.Decode(queryParameters))
         {
-            this.Add(QueryString.Decode(queryParameters));
         }
 
-        public override void Add(string name, string value)
+        public void Add(string key, string value)
         {
-            // When adding - a null value will cause confusion as the NameValueCollection will strip it. 
-            value ??= string.Empty;
+            if (!TryGetValue(key, out var list))
+            {
+                list = new QueryParameter(key);
+                base[key] = list;
+            }
 
-            base.Add(name, value);
+            list.Add(value);
         }
 
-        public override string ToString()
+        public void Add(QueryParameters other)
         {
-            return QueryString.Encode(this);
+            foreach (var pair in other.AsPairs())
+            {
+                Add(pair.Key, pair.Value);
+            }
+        }
+
+        public void Set(string key, string value)
+        {
+            if (!TryGetValue(key, out var param))
+            {
+                base[key] = new QueryParameter(key, value);
+                return;
+            }
+
+            param.Values.Clear();
+            param.Values.Add(value);
+        }
+
+        public void Set(string key, List<string> value)
+        {
+            this[key].Set(value);
+        }
+
+        public IEnumerable<KeyValuePair<string, string>> AsPairs()
+        {
+            foreach (var (key, value) in this)
+            {
+                foreach (var v in value)
+                {
+                    yield return new KeyValuePair<string, string>(key, v);
+                }
+            }
         }
 
         /// <summary>
@@ -38,11 +79,15 @@ namespace KindMen.Uxios.Http
         /// <returns>string or null if none is found</returns>
         public string Consume(string uriTemplatePart)
         {
-            var parameter = this.Get(uriTemplatePart);
-            if (parameter == null) return null;
-            
+            if (!TryGetValue(uriTemplatePart, out var value)) return null;
+
             Remove(uriTemplatePart);
-            return parameter;
+            return string.Join(',', value);
+        }
+
+        public override string ToString()
+        {
+            return QueryString.Encode(this);
         }
     }
 }

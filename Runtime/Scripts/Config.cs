@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading;
 using KindMen.Uxios.Http;
 using Newtonsoft.Json;
-using QueryParameters = KindMen.Uxios.Http.QueryParameters;
 
 namespace KindMen.Uxios
 {
