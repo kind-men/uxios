@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduced the amount of garbage generated when interacting with QueryParameters and when using the QueryString utility
   class.
 
+### Added
+
+- QueryParameter class to represent a single QueryParameter with is, possibly multiple, values.
 
 ## [0.3.5] - 2025-06-03
 

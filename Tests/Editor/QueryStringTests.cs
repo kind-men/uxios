@@ -117,7 +117,7 @@ namespace KindMen.Uxios.Tests
             
             var result = QueryString.Decode(input);
             
-            Assert.That("value", Is.EqualTo(result["key"].Values[0]));
+            Assert.That("value", Is.EqualTo(result["key"].Single));
         }
 
         [Test]
@@ -127,8 +127,8 @@ namespace KindMen.Uxios.Tests
 
             var result = QueryString.Decode(input);
             
-            Assert.That("value1", Is.EqualTo(result["key1"].Values[0]));
-            Assert.That("value2", Is.EqualTo(result["key2"].Values[0]));
+            Assert.That("value1", Is.EqualTo(result["key1"].Single));
+            Assert.That("value2", Is.EqualTo(result["key2"].Single));
         }
 
         [Test]

@@ -8,6 +8,14 @@ namespace KindMen.Uxios.Http
     {
         public string Key { get; }
         public List<string> Values { get; } = new(1);
+        public string Single =>
+            Values.Count switch
+            {
+                0 => null,
+                1 => Values[0],
+                _ => string.Join(',', Values)
+            };
+
         public string this[int i] => Values[i];
 
         public QueryParameter(string key)

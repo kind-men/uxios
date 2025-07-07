@@ -23,8 +23,8 @@
             var queryParams = new QueryParameters(initialParams);
 
             Assert.That(queryParams.Count, Is.EqualTo(2));
-            Assert.That(queryParams["key1"].Values[0], Is.EqualTo("value1"));
-            Assert.That(queryParams["key2"].Values[0], Is.EqualTo("value2"));
+            Assert.That(queryParams["key1"].Single, Is.EqualTo("value1"));
+            Assert.That(queryParams["key2"].Single, Is.EqualTo("value2"));
         }
 
         [Test]
@@ -35,8 +35,8 @@
             var queryParams = new QueryParameters(queryString);
 
             Assert.That(queryParams.Count, Is.EqualTo(2));
-            Assert.That(queryParams["key1"].Values[0], Is.EqualTo("value1"));
-            Assert.That(queryParams["key2"].Values[0], Is.EqualTo("value2"));
+            Assert.That(queryParams["key1"].Single, Is.EqualTo("value1"));
+            Assert.That(queryParams["key2"].Single, Is.EqualTo("value2"));
         }
 
         [Test]
