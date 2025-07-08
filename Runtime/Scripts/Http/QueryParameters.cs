@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace KindMen.Uxios.Http
@@ -6,16 +7,20 @@ namespace KindMen.Uxios.Http
     [System.Serializable]
     public class QueryParameters : Dictionary<string, QueryParameter>
     {
-        public string[] GetValues(string key)
+        private static readonly IEnumerable<string> cachedEmptyValuesArray = Array.Empty<string>();
+
+        public IEnumerable<string> GetValues(string key)
             => TryGetValue(key, out var param)
-                ? param.Values.ToArray()
-                : null;
+                ? param.Values
+                : cachedEmptyValuesArray;
 
         public int Length => Count;
 
         public QueryParameters()
         {
         }
+
+        public QueryParameters(int expectedKeys) : base(expectedKeys) { }
 
         public QueryParameters(QueryParameters col) : base(col)
         {
@@ -38,9 +43,12 @@ namespace KindMen.Uxios.Http
 
         public void Add(QueryParameters other)
         {
-            foreach (var pair in other.AsPairs())
+            foreach (var kv in other)
             {
-                Add(pair.Key, pair.Value);
+                foreach (var v in kv.Value)
+                {
+                    Add(kv.Key, v);
+                }
             }
         }
 
@@ -52,13 +60,18 @@ namespace KindMen.Uxios.Http
                 return;
             }
 
-            param.Values.Clear();
-            param.Values.Add(value);
+            param.Set(value);
         }
 
         public void Set(string key, List<string> value)
         {
-            this[key].Set(value);
+            if (!TryGetValue(key, out var param))
+            {
+                base[key] = new QueryParameter(key, value);
+                return;
+            }
+
+            param.Set(value);
         }
 
         [CanBeNull]
@@ -96,10 +109,9 @@ namespace KindMen.Uxios.Http
         /// <returns>string or null if none is found</returns>
         public string Consume(string uriTemplatePart)
         {
-            if (!TryGetValue(uriTemplatePart, out var value)) return null;
-
+            if (!TryGetValue(uriTemplatePart, out var qp)) return null;
             Remove(uriTemplatePart);
-            return string.Join(',', value);
+            return qp.Single;
         }
 
         public override string ToString()

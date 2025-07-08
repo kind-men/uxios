@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -7,16 +8,45 @@ namespace KindMen.Uxios.Http
     public class QueryParameter : IEnumerable<string>
     {
         public string Key { get; }
-        public List<string> Values { get; } = new(1);
-        public string Single =>
-            Values.Count switch
-            {
-                0 => null,
-                1 => Values[0],
-                _ => string.Join(',', Values)
-            };
 
-        public string this[int i] => Values[i];
+        public int Count =>
+            values is { Count: > 0 }
+                ? values.Count
+                : firstValue != null ? 1 : 0;
+
+        public IEnumerable<string> Values
+        {
+            get {
+                if (values is { Count: > 0 })
+                {
+                    foreach (var v in values) yield return v;
+                }
+                else if (firstValue != null)
+                {
+                    yield return firstValue;
+                }
+            }
+        }
+
+        private string firstValue = null;
+        private List<string> values = null;
+
+        public string Single => Count switch
+        {
+            0 => null,
+            1 => firstValue,
+            _ => string.Join(",", this)
+        };
+
+        public string this[int i]
+        {
+            get
+            {
+                if (i < 0 || i >= Count) throw new IndexOutOfRangeException();
+                
+                return (values?.Count ?? 0) > 0 ? values[i] : firstValue; 
+            }
+        }
 
         public QueryParameter(string key)
         {
@@ -37,28 +67,47 @@ namespace KindMen.Uxios.Http
 
         public void Add(string value)
         {
-            Values.Add(value);
+            if (firstValue == null)
+            {
+                firstValue = value;
+                return;
+            }
+
+            // Will not create an allocation because it will keep the reference and not make a copy 
+            values ??= new List<string>(2) { firstValue };
+            values.Add(value);
+        }
+
+        public void Set(string value)
+        {
+            firstValue = value;
+            values?.Clear();
         }
 
         public void Set(List<string> value)
         {
-            Values.Clear();
-            Values.AddRange(value);
+            if (value == null || value.Count == 0)
+            {
+                firstValue = null;
+                values?.Clear();
+                return;
+            }
+
+            firstValue = value[0];
+            if (value.Count == 1)
+            {
+                values?.Clear();
+                return;
+            }
+
+            values ??= new List<string>(value.Count);
+            values.Clear();
+            values.AddRange(value);
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return Values.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public IEnumerator<string> GetEnumerator() => Values.GetEnumerator();
 
-        public IEnumerator<string> GetEnumerator()
-        {
-            return Values.GetEnumerator();
-        }
-
-        public override string ToString()
-        {
-            return $"{Key}={string.Join(",", Values)}";
-        }
+        public override string ToString() => $"{Key}={Single}";
     }
 }

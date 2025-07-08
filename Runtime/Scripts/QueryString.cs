@@ -92,7 +92,7 @@ namespace KindMen.Uxios
 
         public static QueryParameters Decode(string str, char sep = '&', char eq = '=')
         {
-            var result = new QueryParameters();
+            var result = new QueryParameters(2);
 
             if (string.IsNullOrEmpty(str))
             {
