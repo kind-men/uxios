@@ -1,6 +1,6 @@
 {
   "name": "com.kind-men.uxios",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "displayName": "Uxios",
   "description": "A Unity-native, Axios-inspired HTTP client for streamlined, typed, and extensible networking across platforms.",
   "unity": "2022.3",
