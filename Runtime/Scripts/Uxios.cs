@@ -13,7 +13,7 @@ namespace KindMen.Uxios
 {
     public sealed class Uxios
     {
-        public const string Version = "0.4.1";
+        public const string Version = "0.4.2";
 
         private static Uxios defaultInstance;
         public Interceptors.Interceptors Interceptors { get; } = new();
