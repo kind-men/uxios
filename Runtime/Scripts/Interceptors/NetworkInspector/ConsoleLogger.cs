@@ -35,7 +35,13 @@ namespace KindMen.Uxios.Interceptors.NetworkInspector
         public override Error OnResponseError(Error error)
         {
             var data = JsonConvert.SerializeObject(error, Formatting.Indented);
-            
+
+            if (error.Response == null) {
+                Debug.LogError($"[UXIOS] Error occurred on unknown URL, no response object was available: \n\n{data}");
+
+                return error;
+            }
+
             Debug.LogError($"[UXIOS] Error occurred at {error.Response.Request.Url}: \n\n{data}");
 
             return error;
