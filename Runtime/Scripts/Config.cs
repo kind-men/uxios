@@ -34,6 +34,8 @@ namespace KindMen.Uxios
         [JsonIgnore] public CancellationToken CancelToken = CancellationToken.None;
         #endregion
 
+        public IEnvironment Environment { get; set; }
+        
         public static Config Default()
         {
             return new Config();
@@ -56,7 +58,8 @@ namespace KindMen.Uxios
                 TypeOfResponseType = config.TypeOfResponseType,
                 ValidateStatus = config.ValidateStatus,
                 MaxRedirects = config.MaxRedirects,
-                CancelToken = config.CancelToken
+                CancelToken = config.CancelToken,
+                Environment = config.Environment
             };
         }
         
@@ -108,6 +111,23 @@ namespace KindMen.Uxios
             CancelToken = cancellationSource.Token;
 
             return this;
+        }
+        
+        public Config WithPayload<TPayload>(TPayload payload) where TPayload : class
+        {
+            if (Environment is not Environment<TPayload> env)
+            {
+                env = new Environment<TPayload>();
+                Environment = env;
+            }
+            env.Payload = payload;
+
+            return this;
+        }
+        
+        public TPayload GetPayload<TPayload>() where TPayload : class
+        {
+            return (Environment as Environment<TPayload>)?.Payload;
         }
     }
 }

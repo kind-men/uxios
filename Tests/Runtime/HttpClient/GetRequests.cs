@@ -48,6 +48,33 @@ namespace KindMen.Uxios.Tests.HttpClient
         }
 
         [UnityTest]
+        public IEnumerator GetsWebpageAsStringWithPayload()
+        {
+            var url = new Uri("https://httpbin.org/html");
+            var config = new Config { TypeOfResponseType = ExpectedTypeOfResponse.Text() };
+            config.WithPayload(new ExamplePost()
+            {
+                id = 123,
+                title = "This is a test"
+            });
+
+            var promise = uxios.Get(url, config);
+            
+            yield return PromiseAssertions.AssertPromiseSucceeds(
+                promise, 
+                response =>
+                {
+                    Assert.That(response.Status, Is.EqualTo(HttpStatusCode.OK));
+                    
+                    var payload = response.Config.GetPayload<ExamplePost>();
+                    Assert.That(payload, Is.TypeOf<ExamplePost>());
+                    Assert.That(payload.id, Is.EqualTo(123));
+                    Assert.That(payload.title, Is.EqualTo("This is a test"));
+                }
+            );
+        }
+
+        [UnityTest]
         public IEnumerator GetsWebpageAsStringUsingGenericShorthand()
         {
             var url = new Uri("https://httpbin.org/html");

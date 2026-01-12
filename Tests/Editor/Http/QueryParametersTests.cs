@@ -1,4 +1,6 @@
-﻿namespace KindMen.Uxios.Tests.Http
+﻿using System.Linq;
+
+namespace KindMen.Uxios.Tests.Http
 {
     using NUnit.Framework;
     using KindMen.Uxios.Http;
@@ -47,8 +49,9 @@
             var queryParams = new QueryParameters(queryString);
 
             Assert.That(queryParams.Count, Is.EqualTo(1));
-            Assert.That(queryParams.GetValues("arrayKey").Length, Is.EqualTo(2));
-            Assert.That(queryParams.GetValues("arrayKey"), Is.EquivalentTo(new[] { "value1", "value2" }));
+            var values = queryParams.GetValues("arrayKey").ToArray();
+            Assert.That(values.Length, Is.EqualTo(2));
+            Assert.That(values, Is.EquivalentTo(new[] { "value1", "value2" }));
         }
 
         [Test]

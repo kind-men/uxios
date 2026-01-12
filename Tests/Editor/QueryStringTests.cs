@@ -1,3 +1,4 @@
+using System.Linq;
 using NUnit.Framework;
 using KindMen.Uxios.Http;
 
@@ -137,10 +138,11 @@ namespace KindMen.Uxios.Tests
             string input = "arrayKey[]=value1&arrayKey[]=value2";
             
             var result = QueryString.Decode(input);
-            
-            Assert.That(result.GetValues("arrayKey"), Has.Length.EqualTo(2));
-            Assert.That("value1", Is.EqualTo(result.GetValues("arrayKey")[0]));
-            Assert.That("value2", Is.EqualTo(result.GetValues("arrayKey")[1]));
+
+            var values = result.GetValues("arrayKey").ToArray();
+            Assert.That(values, Has.Length.EqualTo(2));
+            Assert.That("value1", Is.EqualTo(values[0]));
+            Assert.That("value2", Is.EqualTo(values[1]));
         }
 
         [Test]
